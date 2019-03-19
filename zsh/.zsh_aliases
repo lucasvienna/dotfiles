@@ -1,0 +1,120 @@
+# ZSH config
+alias zshconf='nvim ~/.zshrc'
+alias tmuxconf='nvim ~/.tmux.conf'
+alias aliases='nvim ~/.zsh_aliases'
+alias ohmyzsh='nvim ~/.oh-my-zsh'
+
+# Tooling
+alias vim='nvim'
+alias vimdiff='nvim -d'
+alias pping='prettyping'
+alias gkeys='gpg --list-secret-keys --keyid-format LONG'
+
+# ls
+alias ls='ls -GFh'
+alias l='ls -GFhl'
+alias ll='ls -lah'
+
+# Directories
+alias wk='cd ~/Workspace/'
+alias rpl='cd ~/Workspace/ravenpoly.com'
+alias gth='cd ~/Workspace/github.com'
+alias cdapp='cd ~/Workspace/ravenpoly.com/io-hybridapp-flutter'
+alias cdcms='cd ~/Workspace/ravenpoly.com/cloud-mobile-service'
+alias cdun='cd /Users/lucas/Workspace/github.com/unknown-universe-web'
+
+# Ionic
+alias ionsrv='ionic serve'
+alias configure='./scripts/configure.sh'
+alias cleanbuild='cdapp && ./scripts/clean.sh && ./scripts/configure.sh'
+
+# SSH
+alias vmi='ssh sysowner@207.180.248.147'
+
+# ADB
+alias adbd='adb devices'
+alias adbk='adb kill-server'
+alias adbs='adb start-server'
+alias adbks='adb kill-server && adb start-server'
+alias apk="adb -s '2248670c1f037ece' install -r -g $1"
+alias htc10='adb connect 192.168.90.10:5555' # Git Aliases
+
+# git
+alias g='git'
+alias ga='git add'
+alias gaa='git add .'
+alias gaaa='git add --all'
+alias gau='git add --update'
+alias gb='git branch'
+alias gbd='git branch --delete '
+alias gc='git commit'
+alias gcm='git commit --message'
+alias gcf='git commit --fixup'
+alias gco='git checkout'
+alias gcob='git checkout -b'
+alias gcom='git checkout master'
+alias gcos='git checkout staging'
+alias gcod='git checkout develop'
+alias gd='git diff'
+alias gda='git diff HEAD'
+alias gi='git init'
+alias gla='git config -l | grep alias | cut -c 7-'
+alias glg='git log --graph --oneline --decorate --all'
+alias gld="git log --pretty=format:'%h %ad %s' --date=short --all"
+alias gm='git merge --no-ff'
+alias gma='git merge --abort'
+alias gmc='git merge --continue'
+alias gp='git pull'
+alias gpr='git pull --rebase'
+alias gpo='git push -u origin'
+alias gpp='git push'
+alias gr='git rebase'
+alias gs='git status'
+alias gss='git status --short'
+alias gst='git stash'
+alias gsta='git stash apply'
+alias gstd='git stash drop'
+alias gstl='git stash list'
+alias gstp='git stash pop'
+alias gsts='git stash save'
+# Repo starter
+alias grao='git remote add origin'
+alias gac='gaa && gcm'
+alias gpoa='git push -u origin --all'
+
+# Git
+alias gitsync="git branch -r | grep -v '\->' | while read remote; do git branch --track "${remote#origin/}" "$remote"; done && git pull --all"
+alias gpom="git pull origin master"
+
+# Recursively delete `.DS_Store` files
+alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
+
+# Empty the Trash on all mounted volumes and the main HDD.
+# Also, clear Apple’s System Logs to improve shell startup speed.
+# Finally, clear download history from quarantine. https://mths.be/bum
+alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl; sqlite3 ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV* 'delete from LSQuarantineEvent'"
+
+# Show/hide hidden files in Finder
+alias show="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
+alias hide="defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder"
+
+# Hide/show all desktop icons (useful when presenting)
+alias hidedesktop="defaults write com.apple.finder CreateDesktop -bool false && killall Finder"
+alias showdesktop="defaults write com.apple.finder CreateDesktop -bool true && killall Finder"
+
+# http://xkcd.com/530/
+alias stfu="osascript -e 'set volume output muted true'"
+alias pumpitup="osascript -e 'set volume output volume 100'"
+
+# Lock the screen (when going AFK)
+alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
+
+# Reload the shell (i.e. invoke as a login shell)
+alias reload="exec ${SHELL} -l"
+
+# Kill all the tabs in Chrome to free up memory
+# [C] explained: http://www.commandlinefu.com/commands/view/402/exclude-grep-from-your-grepped-output-of-ps-alias-included-in-description
+alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v extension-process | tr -s ' ' | cut -d ' ' -f2 | xargs kill"
+
+# Docker
+alias dockerips="docker ps -q | xargs -n 1 docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}} {{ .Name }}' | sed 's/ \// /'"
