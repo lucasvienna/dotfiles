@@ -61,7 +61,8 @@ Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
 " linting engine
 Plug 'w0rp/ale'
 
-
+" git wrapper
+Plug 'tpope/vim-fugitive'
 call plug#end()
 
 
