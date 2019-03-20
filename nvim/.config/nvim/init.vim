@@ -20,6 +20,10 @@ call plug#begin()
 " nord-vim colorscheme
 Plug 'arcticicestudio/nord-vim'
 
+" vim-airline for that sweet statusbar
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+
 " neomake
 Plug 'neomake/neomake'
 
