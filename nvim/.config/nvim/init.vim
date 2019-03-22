@@ -28,6 +28,9 @@ Plug 'vim-airline/vim-airline-themes'
 " neomake
 Plug 'neomake/neomake'
 
+" markdown preview suite
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
+
 " JavaScript Highlight & Improved Indentation
 Plug 'pangloss/vim-javascript'
 
@@ -64,6 +67,7 @@ Plug 'w0rp/ale'
 
 " git wrapper
 Plug 'tpope/vim-fugitive'
+
 call plug#end()
 
 
