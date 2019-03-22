@@ -9,6 +9,7 @@ alias vim='nvim'
 alias vimdiff='nvim -d'
 alias pping='prettyping'
 alias gkeys='gpg --list-secret-keys --keyid-format LONG'
+alias tree="tree -a -I '.git'"
 
 # ls
 alias ls='ls -GFh'
