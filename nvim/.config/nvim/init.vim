@@ -68,6 +68,9 @@ Plug 'w0rp/ale'
 " git wrapper
 Plug 'tpope/vim-fugitive'
 
+" sudo workaround plugin
+Plug 'lambdalisue/suda.vim'
+
 call plug#end()
 
 
@@ -282,4 +285,5 @@ set si
 
 " :W sudo saves the file
 " (useful for handling the permission-denied error)
-command W w !sudo tee % > /dev/null
+" command W w !sudo -A tee % > /dev/null
+command W w suda://%
