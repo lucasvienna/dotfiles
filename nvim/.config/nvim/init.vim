@@ -31,20 +31,11 @@ Plug 'neomake/neomake'
 " markdown preview suite
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
 
-" JavaScript Highlight & Improved Indentation
-Plug 'pangloss/vim-javascript'
-
-" Typescript Syntax Highlight
-Plug 'leafgarland/typescript-vim'
-
 " OmniSharp IDE functionality
 Plug 'OmniSharp/omnisharp-vim'
 
 " Async execution library needed by tsuquyomi
 Plug 'Shougo/vimproc.vim', {'do' : 'make'}
-
-" A client to TSSServer so that we can get autocompletion
-Plug 'Quramy/tsuquyomi'
 
 " NERDTree
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
@@ -55,9 +46,6 @@ Plug 'junegunn/fzf.vim'
 
 " .editorconfig
 Plug 'editorconfig/editorconfig-vim'
-
-" emmet
-Plug 'mattn/emmet-vim'
 
 " semantic-based completion
 Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
