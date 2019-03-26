@@ -9,6 +9,7 @@ set ttyfast                 " Faster redrawing
 set lazyredraw              " Only redraw when necessary
 set cursorline              " Find the current line quickly.
 set noshowmode              " Hide current mode below statusline
+filetype plugin on          " OmniSharp won't work without this setting
 
 
 
