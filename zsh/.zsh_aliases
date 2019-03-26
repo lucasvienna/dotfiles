@@ -19,7 +19,7 @@ alias ll='ls -lah'
 
 # Directories
 alias wk='cd ~/Workspace/'
-alias iib='cd ~/Workspace/IIBB'
+alias iib='cd ~/Workspace/github.com/IIBB'
 alias rpl='cd ~/Workspace/ravenpoly.com'
 alias gth='cd ~/Workspace/github.com'
 alias cdapp='cd ~/Workspace/ravenpoly.com/io-hybridapp-flutter'
