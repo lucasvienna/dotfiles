@@ -1,6 +1,7 @@
 # ZSH config
 alias zshconf='nvim ~/.zshrc'
 alias tmuxconf='nvim ~/.tmux.conf'
+alias vimconf='nvim ~/.config/nvim/init.vim'
 alias aliases='nvim ~/.zsh_aliases'
 alias ohmyzsh='nvim ~/.oh-my-zsh'
 
