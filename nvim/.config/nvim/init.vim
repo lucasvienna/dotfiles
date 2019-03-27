@@ -9,7 +9,6 @@ set ttyfast                 " Faster redrawing
 set lazyredraw              " Only redraw when necessary
 set cursorline              " Find the current line quickly.
 set noshowmode              " Hide current mode below statusline
-filetype plugin on          " OmniSharp won't work without this setting
 
 
 
@@ -35,9 +34,6 @@ Plug 'tpope/vim-dispatch'
 " markdown preview suite
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
 
-" OmniSharp IDE functionality
-Plug 'OmniSharp/omnisharp-vim'
-
 " Async execution library needed by tsuquyomi
 Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 
@@ -52,7 +48,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'editorconfig/editorconfig-vim'
 
 " semantic-based completion
-Plug 'Valloric/YouCompleteMe', { 'do': './install.py --cs-completer --go-completer --ts-completer'}
+Plug 'Valloric/YouCompleteMe', { 'do': './install.py --go-completer'}
 
 " linting engine
 Plug 'w0rp/ale'
@@ -148,10 +144,6 @@ let g:ale_lint_delay = 1000
 " fixer configurations
 let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace'],
-\}
-
-let g:ale_linters = {
-\ 'cs': ['OmniSharp']
 \}
 
 " make FZF respect gitignore if `ag` is installed
