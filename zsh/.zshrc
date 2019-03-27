@@ -93,8 +93,9 @@ export GOBIN="$GOPATH/bin"
 export GOROOT="$(brew --prefix golang)/libexec"
 export PATH="$PATH:$GOPATH/bin:$GOROOT/bin"
 
-# Additional programs on PATH
+# app deployment via fastlane
 export PATH="$PATH:$HOME/.fastlane/bin"
+# flutter SDK
 export PATH="$PATH:/usr/local/share/flutter/bin"
 
 # Initialize tmux or re-attach to running session
