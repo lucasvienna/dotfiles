@@ -28,13 +28,10 @@ Plug 'vim-airline/vim-airline-themes'
 " neomake
 Plug 'neomake/neomake'
 
-" vim-dispatch for async builds
-Plug 'tpope/vim-dispatch'
-
 " markdown preview suite
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
 
-" Async execution library needed by tsuquyomi
+" Async execution library
 Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 
 " NERDTree
@@ -52,6 +49,9 @@ Plug 'Valloric/YouCompleteMe', { 'do': './install.py --go-completer'}
 
 " linting engine
 Plug 'w0rp/ale'
+
+" change surroundings
+Plug 'tpope/vim-surround'
 
 " git wrapper
 Plug 'tpope/vim-fugitive'
