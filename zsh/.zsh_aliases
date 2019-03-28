@@ -40,7 +40,7 @@ alias adbk='adb kill-server'
 alias adbs='adb start-server'
 alias adbks='adb kill-server && adb start-server'
 alias apk="adb -s '2248670c1f037ece' install -r -g $1"
-alias htc10='adb connect 192.168.90.10:5555' # Git Aliases
+alias htc10='adb connect 192.168.90.10:5555'
 
 # git
 alias g='git'
