@@ -1,6 +1,6 @@
 # If you come from bash you might have to change your $PATH.
-# export PATH="$HOME/.fastlane/bin:$PATH"
-export PATH=$HOME/bin:/usr/local/bin:/usr/local/sbin:$PATH
+export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+export PATH=$HOME/bin:/usr/local/sbin:$PATH
 
 # Path to your oh-my-zsh installation.
 export ZSH="/Users/lucas/.oh-my-zsh"
@@ -74,15 +74,15 @@ export GPG_TTY=$(tty)
 # Create a JAVA_HOME variable, determined dynamically
 export JAVA_HOME=$(/usr/libexec/java_home)
 # Add that to the global PATH variable
-export PATH=${JAVA_HOME}/bin:$PATH
+export PATH=$PATH:${JAVA_HOME}/bin
 # Set Android_HOME
 export ANDROID_HOME=~/Library/Android/sdk
 # Add the Android SDK to the ANDROID_HOME variable
-export PATH=$ANDROID_HOME/platform-tools:$PATH
-export PATH=$ANDROID_HOME/tools:$PATH
-export PATH=$ANDROID_HOME/tools/bin:$PATH
-export PATH=$ANDROID_HOME/emulator:$PATH
-export PATH=$ANDROID_HOME/build-tools/27.0.3:$PATH
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH=$PATH:$ANDROID_HOME/tools
+export PATH=$PATH:$ANDROID_HOME/tools/bin
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/build-tools/27.0.3
 # Set GRADLE_HOME
 export GRADLE_HOME=$(brew info gradle | grep /usr/local/Cellar/gradle | awk '{print $1}')
 export PATH=$PATH:$GRADLE_HOME/bin
