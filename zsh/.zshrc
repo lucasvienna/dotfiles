@@ -102,7 +102,8 @@ export PATH="$PATH:/usr/local/share/flutter/bin"
 # brew kegs that we want to replace the system tools with
 export PATH="/usr/local/opt/curl/bin:$PATH"               # curl
 export PATH="/usr/local/opt/ruby/bin:$PATH"               # ruby
-export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH" # gnu-sed
+export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH" # sed
+export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"    # grep, egrep, fgrep
 
 # keg-ruby gems must also be added to PATH
 export PATH="$PATH:/usr/local/lib/ruby/gems/2.6.0/bin"
