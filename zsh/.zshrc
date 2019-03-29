@@ -95,8 +95,17 @@ export PATH="$PATH:$GOPATH/bin:$GOROOT/bin"
 
 # app deployment via fastlane
 export PATH="$PATH:$HOME/.fastlane/bin"
+
 # flutter SDK
 export PATH="$PATH:/usr/local/share/flutter/bin"
+
+# brew kegs that we want to replace the system tools with
+export PATH="/usr/local/opt/curl/bin:$PATH"               # curl
+export PATH="/usr/local/opt/ruby/bin:$PATH"               # ruby
+export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH" # gnu-sed
+
+# keg-ruby gems must also be added to PATH
+export PATH="$PATH:/usr/local/lib/ruby/gems/2.6.0/bin"
 
 # Initialize tmux or re-attach to running session
 if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
