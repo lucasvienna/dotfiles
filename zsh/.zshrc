@@ -1,6 +1,6 @@
 # If you come from bash you might have to change your $PATH.
-export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
-export PATH=$HOME/bin:/usr/local/sbin:$PATH
+export PATH=$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+eval `/usr/libexec/path_helper -s`
 
 # Path to your oh-my-zsh installation.
 export ZSH="/Users/lucas/.oh-my-zsh"
