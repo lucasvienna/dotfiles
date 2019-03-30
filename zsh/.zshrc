@@ -1,5 +1,6 @@
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+# Put programs on `/etc/paths.d/` in the PATH
 eval `/usr/libexec/path_helper -s`
 
 # Path to your oh-my-zsh installation.
