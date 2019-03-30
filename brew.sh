@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script comes from Mathias Bynens with slight modifications made by me
+# This script comes from Mathias Bynens with slight modifications made by lucasfcosta and me
 # https://github.com/mathiasbynens/dotfiles/blob/bb6c76e410bf7b1693edfe60239461fc9205ec02/brew.sh
 
 echo "Installing brew formulae..."
@@ -27,6 +27,9 @@ ln -s "${BREW_PREFIX}/bin/gsha256sum" "${BREW_PREFIX}/bin/sha256sum"
 brew install findutils
 # Install GNU `sed`.
 brew install gnu-sed
+# Install more recent versions of some macOS tools.
+brew install grep
+brew install openssh
 
 # Install GnuPG to enable PGP-signing commits.
 # Also install pinentry so it works with Source Tree
@@ -34,6 +37,9 @@ brew install gnupg pinentry-mac
 
 # tmux - terminal multiplexer
 brew install tmux
+
+# Enables macOS clipboard interactions from inside tmux
+brew install reattach-to-user-namespace
 
 # silver searcher, enhances fzf
 brew install the_silver_searcher
@@ -55,10 +61,6 @@ brew install go
 # Install `wget` and `curl`.
 brew install wget
 brew install curl
-
-# Install more recent versions of some macOS tools.
-brew install grep
-brew install openssh
 
 # Full suite of docker utilities
 brew install docker
@@ -107,7 +109,7 @@ brew cask install skype
 brew cask install discord
 
 # -------------------------------
-# vIM & neo vIM
+# neo vIM
 # -------------------------------
 
 # Change the user's life forever
