@@ -1,41 +1,46 @@
 [user]
-  name = Lucas Vienna
-  email = dev@lucasvienna.dev
-  signingkey = 1E763A1C0C9B66CD
+    name = Lucas Vienna
+    email = dev@lucasvienna.dev
+    signingkey = 1E763A1C0C9B66CD
 [commit]
-  template = /Users/lucas/.stCommitMsg
-  gpgsign = true
+    template = /Users/lucas/.stCommitMsg
+    gpgsign = true
 [core]
-  editor = nvim
-  whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
-  excludesfile = /Users/lucas/.gitignore
+    editor = nvim
+    whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
+    excludesfile = /Users/lucas/.gitignore_global
 
 [credential]
-  helper = store
+    helper = store
 
 [merge]
-  tool = vimdiff
+    tool = vimdiff
 [mergetool]
-  prompt = false
+    prompt = false
 [mergetool "vimdiff"]
-  cmd = nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
+    cmd = nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
+[mergetool "sourcetree"]
+    cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+    trustExitCode = true
 
 [diff]
-  tool = vimdiff
+    tool = vimdiff
 [difftool]
-  prompt = false
+    prompt = false
+[difftool "sourcetree"]
+    cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 
 [pull]
-  rebase = true
+    rebase = true
 
 [alias]
-  unstage = reset --soft HEAD^
-  ########
-  dev = !git checkout develop && git pull origin develop
-  staging = !git checkout staging && git pull origin staging
-  master = !git checkout master && git pull origin
-  ########
-  aliases = !git config -l | grep alias | cut -c 7-
+    unstage = reset --soft HEAD^
+    ########
+    dev = !git checkout develop && git pull origin develop
+    staging = !git checkout staging && git pull origin staging
+    master = !git checkout master && git pull origin
+    ########
+    aliases = !git config -l | grep alias | cut -c 7-
 
 [gpg]
-  program = gpg
+    program = gpg
