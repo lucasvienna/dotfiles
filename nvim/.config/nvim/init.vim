@@ -59,6 +59,9 @@ Plug 'tpope/vim-fugitive'
 " sudo workaround plugin
 Plug 'lambdalisue/suda.vim'
 
+" tmux conf highlights
+Plug 'tmux-plugins/vim-tmux'
+
 call plug#end()
 
 
