@@ -72,10 +72,11 @@ export N_PREFIX="$HOME/n"; [[ :$PATH: == *":$N_PREFIX/bin:"* ]] || PATH+=":$N_PR
 # gpg ioctl fix
 export GPG_TTY=$(tty)
 
-# Create a JAVA_HOME variable, determined dynamically
-export JAVA_HOME=$(/usr/libexec/java_home)
-# Add that to the global PATH variable
+# Create a JAVA_HOME variable, determined dynamically. Not. It's slow. Set it manually
+# export JAVA_HOME=$(/usr/libexec/java_home)
+export JAVA_HOME="/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home"
 export PATH=$PATH:${JAVA_HOME}/bin
+
 # Set Android_HOME
 export ANDROID_HOME=~/Library/Android/sdk
 # Add the Android SDK to the ANDROID_HOME variable
@@ -85,13 +86,18 @@ export PATH=$PATH:$ANDROID_HOME/tools/bin
 export PATH=$PATH:$ANDROID_HOME/emulator
 export PATH=$PATH:$ANDROID_HOME/build-tools/28.0.3
 # Set GRADLE_HOME
-export GRADLE_HOME=$(brew info gradle | grep /usr/local/Cellar/gradle | awk '{print $1}')
+# The line below is an automated version finder. However, awk takes a fuckload of time to run
+# export GRADLE_HOME=$(brew info gradle | grep /usr/local/Cellar/gradle | awk '{print $1}')
+# Therefore we manually set the home var to the brew prefix
+export GRADLE_HOME="/usr/local/opt/gradle/libexec"
 export PATH=$PATH:$GRADLE_HOME/bin
 
 # Set GOPATH and GOROOT
 export GOPATH="$HOME/.go"
 export GOBIN="$GOPATH/bin"
-export GOROOT="$(brew --prefix golang)/libexec"
+# Just like gradle, the line below is an automated version finder. It's also slow.
+# export GOROOT="$(brew --prefix golang)/libexec"
+export GOROOT="/usr/local/opt/go/libexec"
 export PATH="$PATH:$GOPATH/bin:$GOROOT/bin"
 
 # app deployment via fastlane
