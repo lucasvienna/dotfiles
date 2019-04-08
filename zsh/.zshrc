@@ -29,12 +29,12 @@ ZSH_THEME="spaceship"
 plugins=(
   git
   tmux
-  zsh-autosuggestions
-  zsh-syntax-highlighting
   golang
   node
   docker
   docker-compose
+  zsh-autosuggestions
+  zsh-syntax-highlighting
 )
 
 source $ZSH/oh-my-zsh.sh
