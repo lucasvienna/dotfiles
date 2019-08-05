@@ -30,6 +30,7 @@ brew install gnu-sed
 # Install more recent versions of some macOS tools.
 brew install grep
 brew install openssh
+brew install cmake
 
 # Install GnuPG to enable PGP-signing commits.
 # Also install pinentry so it works with Source Tree
@@ -95,7 +96,6 @@ brew cask install adoptopenjdk8
 brew cask install docker
 brew cask install fastlane
 brew cask install android-studio
-brew cask install gitkraken
 brew cask install alfred
 
 # Browsers
@@ -103,7 +103,7 @@ brew cask install google-chrome
 brew cask install firefox
 
 # Communication
-brew cask install rocket
+brew cask install rocket-chat
 brew cask install slack
 brew cask install skype
 brew cask install discord
