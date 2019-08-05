@@ -2,7 +2,7 @@
 alias zshconf='nvim ~/.zshrc'
 alias tmuxconf='nvim ~/.tmux.conf'
 alias vimconf='nvim ~/.config/nvim/init.vim'
-alias aliases='nvim ~/.zsh_aliases'
+alias aliases='nvim ~/.zsh_aliases && source ~/.zsh_aliases'
 alias ohmyzsh='nvim ~/.oh-my-zsh'
 
 # Reload the shell
@@ -14,6 +14,7 @@ alias vimdiff='nvim -d'
 alias pping='prettyping'
 alias gkeys='gpg --list-secret-keys --keyid-format LONG'
 alias tree="tree -a -I '.git'"
+alias tmac="tmux attach -t macOS || tmux new -s macOS"
 
 # ls
 alias ls='ls -GFh'
@@ -142,5 +143,7 @@ alias gac='gaaa && gcm'
 alias gii="gi && gac 'Initial commit'"
 alias grao='git remote add origin'
 alias gpoa='git push -u origin --all'
+##### Commitizen
+alias gcz='git cz'
 ##### sync all branches with remote
 alias gitsync="git branch -r | grep -v '\->' | while read remote; do git branch --track "${remote#origin/}" "$remote"; done && git pull --all"
