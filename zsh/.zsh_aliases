@@ -15,6 +15,7 @@ alias pping='prettyping'
 alias gkeys='gpg --list-secret-keys --keyid-format LONG'
 alias tree="tree -a -I '.git'"
 alias tmac="tmux attach -t macOS || tmux new -s macOS"
+alias jserve="bundle exec jekyll serve"
 
 # ls
 alias ls='ls -GFh'
@@ -77,68 +78,6 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 alias dockerips="docker ps -q | xargs -n 1 docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}} {{ .Name }}' | sed 's/ \// /'"
 
 ##### git
-alias g='git'
-##### add
-alias ga='git add'
-alias gaa='git add .'
-alias gaaa='git add --all'
-alias gau='git add --update'
-##### branch
-alias gb='git branch'
-alias gbd='git branch --delete '
-##### commit
-alias gc='git commit'
-alias gcm='git commit --message'
-alias gcf='git commit --fixup'
-##### checkout
-alias gco='git checkout'
-alias gcob='git checkout -b'
-alias gcom='git checkout master'
-alias gcos='git checkout staging'
-alias gcod='git checkout develop'
-##### diff
-alias gd='git diff'
-alias gda='git diff HEAD'
-alias gdt='git difftool'
-##### init
-alias gi='git init'
-##### list aliases
-alias gla='git config -l | grep alias | cut -c 7-'
-##### log
-alias glg='git log --graph --oneline --decorate --all'
-alias gld="git log --pretty=format:'%h %ad %s' --date=short --all"
-alias gls='git log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate'
-alias gll='git log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat'
-##### merge
-alias gm='git merge --no-ff'
-alias gma='git merge --abort'
-alias gmc='git merge --continue'
-##### pull
-alias gl='git pull'
-alias glr='git pull --rebase'
-alias glom="git pull origin master"
-##### push
-alias gp='git push'
-alias gpv='git push -v'
-alias gpo='git push -u origin'
-alias gpu='git push -u upstream'
-##### rebase
-alias grb='git rebase'
-##### reset
-alias gr='git reset'
-alias grh='git reset --hard'
-alias grs='git reset --soft HEAD^'
-##### status
-alias gs='git status'
-alias gss='git status --short'
-##### stash
-alias gst='git stash'
-alias gsta='git stash apply'
-alias gstd='git stash drop'
-alias gstl='git stash list'
-alias gstp='git stash pop'
-alias gsts='git stash save'
-##### composite aliases
 alias gac='gaaa && gcm'
 alias gii="gi && gac 'Initial commit'"
 alias grao='git remote add origin'
