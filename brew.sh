@@ -31,6 +31,8 @@ brew install gnu-sed
 brew install grep
 brew install openssh
 brew install cmake
+# Install stow for handling symlinks
+brew install stow
 
 # Install GnuPG to enable PGP-signing commits.
 # Also install pinentry so it works with Source Tree
