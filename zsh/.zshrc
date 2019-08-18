@@ -111,8 +111,3 @@ export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"    # grep, egrep, fgrep
 
 # keg-ruby gems must also be added to PATH
 export PATH="$PATH:/usr/local/lib/ruby/gems/2.6.0/bin"
-
-# Initialize tmux or re-attach to running session
-if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
-  tmux attach -t macOS || tmux new -s macOS
-fi
