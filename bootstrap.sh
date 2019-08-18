@@ -5,7 +5,7 @@
 
 cd $(dirname "${BASH_SOURCE}");
 
-git pull origin master;
+git pull origin master
 
 function spaceship() {
   # This installs the spaceship theme for zsh
@@ -17,6 +17,11 @@ function spaceship() {
     git clone https://github.com/denysdovhan/spaceship-prompt.git "$ZSH/custom/themes/spaceship-prompt"
     ln -s "$ZSH/custom/themes/spaceship-prompt/spaceship.zsh-theme" "$ZSH/custom/themes/spaceship.zsh-theme"
   fi
+}
+
+function italicTerm() {
+  tic -x terminfo/xterm-256color-italic.terminfo
+  tic -x terminfo/tmux-256color.terminfo
 }
 
 function doIt() {
@@ -36,18 +41,14 @@ function doIt() {
   stow zsh
   stow git
 
-  # install nvim plugins
+  # install nvim plugins and python addon
+  pip3 install --user --upgrade neovim
   nvim +PlugClean! +qall
   nvim +silent +PlugInstall +qall
   python3 ~/.config/nvim/plugged/YouCompleteMe/install.py
 
   # launch the spaceship
   spaceship
-}
-
-function italicTerm() {
-  tic -x terminfo/xterm-256color-italic.terminfo
-  tic -x terminfo/tmux-256color.terminfo
 }
 
 if [ "$1" == "--force" -o "$1" == "-f" ]; then
