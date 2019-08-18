@@ -47,6 +47,9 @@ function doIt() {
   nvim +silent +PlugInstall +qall
   python3 ~/.config/nvim/plugged/YouCompleteMe/install.py
 
+  # install tpm
+  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
   # launch the spaceship
   spaceship
 }
