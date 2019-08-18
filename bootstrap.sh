@@ -20,18 +20,28 @@ function spaceship() {
 }
 
 function doIt() {
+  ./brew.sh
+
   # install homebrew
   ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   # install vim-plug
   curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  # install oh-my-zsh
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" "" --unattended
 
-  ./brew.sh
-
+  # link dotfiles
   stow tmux
   stow nvim
   stow zsh
   stow git
+
+  # install nvim plugins
+  nvim +PlugClean! +qall
+  nvim +silent +PlugInstall +qall
+  python3 ~/.config/nvim/plugged/YouCompleteMe/install.py
+
+  # launch the spaceship
   spaceship
 }
 

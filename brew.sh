@@ -116,9 +116,6 @@ brew cask install discord
 # Change the user's life forever
 # God bless the best text editor on earth
 brew install neovim
-nvim +PlugClean! +qall
-nvim +silent +PlugInstall +qall
-python3 ~/.config/nvim/plugged/YouCompleteMe/install.py
 
 # Remove outdated versions from the cellar.
 brew cleanup
