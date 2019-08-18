@@ -30,12 +30,6 @@ alias rpl='cd ~/Workspace/ravenpoly.com'
 alias cdapp='cd ~/Workspace/ravenpoly.com/io-hybridapp-flutter'
 alias cdcms='cd ~/Workspace/ravenpoly.com/cloud-mobile-service'
 
-# Ionic
-alias ionsrv='ionic serve'
-alias ionclean='./scripts/clean.sh'
-alias ionconf='./scripts/configure.sh'
-alias cleanconf='cdapp && ./scripts/clean.sh && ./scripts/configure.sh'
-
 # SSH
 alias vmi='ssh sysowner@207.180.248.147'
 
