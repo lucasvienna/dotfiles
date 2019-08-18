@@ -26,13 +26,13 @@ function doIt() {
   curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
+  ./brew.sh
+
   stow tmux
   stow nvim
   stow zsh
   stow git
   spaceship
-
-  ./brew.sh
 }
 
 function italicTerm() {
