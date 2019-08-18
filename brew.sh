@@ -18,21 +18,25 @@ brew upgrade
 # Save Homebrew’s installed location.
 BREW_PREFIX=$(brew --prefix)
 
+
+# -------------------------------
+# CLI Tools
+# -------------------------------
 # Install GNU core utilities (those that come with macOS are outdated).
-# Don’t forget to add `$(brew --prefix coreutils)/libexec/gnubin` to `$PATH`.
 brew install coreutils
 ln -s "${BREW_PREFIX}/bin/gsha256sum" "${BREW_PREFIX}/bin/sha256sum"
 
-# Install GNU `find`, `locate`, `updatedb`, and `xargs`, `g`-prefixed.
-brew install findutils
-# Install GNU `sed`.
-brew install gnu-sed
+# Install GNU `find`, `locate`, `updatedb`, `xargs`, `sed`. All `g`-prefixed.
+brew install findutils gnu-sed
+
 # Install more recent versions of some macOS tools.
-brew install grep
-brew install openssh
-brew install cmake
+brew install grep openssh cmake
+
 # Install stow for handling symlinks
 brew install stow
+
+# Install `wget` and `curl`.
+brew install wget curl
 
 # Install GnuPG to enable PGP-signing commits.
 # Also install pinentry so it works with Source Tree
@@ -52,45 +56,45 @@ brew install the_silver_searcher
 # It is also a good CLI tool
 brew install ag
 
-# This is needed for python support on Neovim for YouCompleteMe
-# Please see https://github.com/neovim/neovim/issues/1315
-brew install python3
-pip3 install --user --upgrade neovim
+# God bless the best text editor on earth
+# Change the user's life forever
+brew install neovim
 
+
+# -------------------------------
 # Programming languages
-brew install dart
-brew install go
+# -------------------------------
+brew install dart go python3
 
-# Install `wget` and `curl`.
-brew install wget
-brew install curl
 
-# Full suite of docker utilities
-brew install docker
-brew install docker-compose
-brew install docker-machine
+# -------------------------------
+# Docker Suite
+# -------------------------------
+brew install docker docker-compose docker-machine
 
-# Flutter development package
+
+# -------------------------------
+# Flutter
+# -------------------------------
 brew install gradle
 brew install --HEAD usbmuxd
 brew link usbmuxd
 brew install --HEAD libimobiledevice
 brew install ideviceinstaller ios-deploy cocoapods
 
-# Install other useful binaries.
-brew install git
-brew install git-flow
+# -------------------------------
+# Miscelaneous Tools
+# -------------------------------
+brew install git git-flow
 brew install prettyping
-brew install tree
 brew install ssh-copy-id
+brew install tree
 brew install yarn --without-node
-
 
 
 # -------------------------------
 # Casks
 # -------------------------------
-
 # Java OpenJDK
 brew cask install adoptopenjdk8
 
@@ -110,12 +114,7 @@ brew cask install skype
 brew cask install discord
 
 # -------------------------------
-# neo vIM
+# Post-Install
 # -------------------------------
-
-# Change the user's life forever
-# God bless the best text editor on earth
-brew install neovim
-
 # Remove outdated versions from the cellar.
 brew cleanup
