@@ -20,27 +20,38 @@ function spaceship() {
 }
 
 function doIt() {
-  stow tmux;
-  stow nvim;
-  stow zsh;
-  stow git;
-  spaceship;
+  # install homebrew
+  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  # install vim-plug
+  curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+      https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+  stow tmux
+  stow nvim
+  stow zsh
+  stow git
+  spaceship
+
+  ./brew.sh
 }
 
 function italicTerm() {
-  tic -x terminfo/xterm-256color-italic.terminfo;
-  tic -x terminfo/tmux-256color.terminfo;
+  tic -x terminfo/xterm-256color-italic.terminfo
+  tic -x terminfo/tmux-256color.terminfo
 }
 
 if [ "$1" == "--force" -o "$1" == "-f" ]; then
-  doIt;
+  doIt
+  italicTerm
 else
   read -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1;
   echo "";
   if [[ $REPLY =~ ^[Yy]$ ]]; then
-    doIt;
-    italicTerm;
+    doIt
+    italicTerm
   fi;
 fi;
 
-unset doIt;
+unset doIt
+unset italicTerm
+unset spaceship
