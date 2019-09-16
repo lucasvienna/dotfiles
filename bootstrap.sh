@@ -25,8 +25,6 @@ function italicTerm() {
 }
 
 function doIt() {
-  ./brew.sh
-
   # install homebrew
   ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   # install vim-plug
@@ -57,12 +55,14 @@ function doIt() {
 if [ "$1" == "--force" -o "$1" == "-f" ]; then
   doIt
   italicTerm
+  ./brew.sh
 else
   read -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1;
   echo "";
   if [[ $REPLY =~ ^[Yy]$ ]]; then
     doIt
     italicTerm
+    ./brew.sh
   fi;
 fi;
 
