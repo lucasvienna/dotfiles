@@ -27,8 +27,8 @@ alias wk='cd ~/Workspace/'
 alias gth='cd ~/Workspace/github.com'
 alias iib='cd ~/Workspace/github.com/IIBB'
 alias rpl='cd ~/Workspace/ravenpoly.com'
-alias cdapp='cd ~/Workspace/ravenpoly.com/io-hybridapp-flutter'
-alias cdcms='cd ~/Workspace/ravenpoly.com/cloud-mobile-service'
+alias cdapp='cd ~/Workspace/ravenpoly.com/seasonal'
+alias cdcms='cd ~/Workspace/ravenpoly.com/cloud-core-service'
 
 # SSH
 alias vmi='ssh sysowner@207.180.248.147'
@@ -72,7 +72,7 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 alias dockerips="docker ps -q | xargs -n 1 docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}} {{ .Name }}' | sed 's/ \// /'"
 
 ##### git
-alias gac='gaaa && gcm'
+alias gac='gaa && gcm'
 alias gii="gi && gac 'Initial commit'"
 alias grao='git remote add origin'
 alias gpoa='git push -u origin --all'
