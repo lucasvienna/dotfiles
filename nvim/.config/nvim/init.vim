@@ -18,8 +18,8 @@ set noshowmode              " Hide current mode below statusline
 
 call plug#begin()
 
-" nord-vim colorscheme
-Plug 'arcticicestudio/nord-vim'
+" dracula colorscheme
+Plug 'dracula/vim', { 'as': 'dracula' }
 
 " vim-airline for that sweet statusbar
 Plug 'vim-airline/vim-airline'
@@ -176,7 +176,7 @@ set t_Co=256
 set termguicolors
 
 " set colorscheme
-colorscheme nord
+colorscheme dracula
 
 " long lines as just one line (have to scroll horizontally)
 set nowrap
