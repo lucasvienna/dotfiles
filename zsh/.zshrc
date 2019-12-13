@@ -63,9 +63,6 @@ if [ -f ~/.zsh_aliases ]; then
     . ~/.zsh_aliases
 fi
 
-# n - node version manager
-export N_PREFIX="$HOME/n"; [[ :$PATH: == *":$N_PREFIX/bin:"* ]] || PATH+=":$N_PREFIX/bin"  # Added by n-install (see http://git.io/n-install-repo).
-
 # gpg ioctl fix
 export GPG_TTY=$(tty)
 
@@ -111,3 +108,7 @@ export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"    # grep, egrep, fgrep
 
 # keg-ruby gems must also be added to PATH
 export PATH="$PATH:/usr/local/lib/ruby/gems/2.6.0/bin"
+
+# add custom n path
+export N_PREFIX="$HOME/.n"
+export PATH="$N_PREFIX/bin:$PATH"
