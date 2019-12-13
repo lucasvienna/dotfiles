@@ -4,6 +4,7 @@
 	signingkey = 1E763A1C0C9B66CD
 [commit]
 	gpgsign = true
+	template = /Users/lucas/.stCommitMsg
 [core]
 	editor = nvim
 	whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
@@ -38,3 +39,11 @@
 	master = !git checkout master && git pull origin
 	########
 	aliases = !git config -l | grep alias | cut -c 7-
+[tag]
+	forceSignAnnotated = true
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
