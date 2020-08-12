@@ -14,55 +14,32 @@ alias vimdiff='nvim -d'
 alias pping='prettyping'
 alias gkeys='gpg --list-secret-keys --keyid-format LONG'
 alias tree="tree -a -I '.git'"
-alias tmac="tmux attach -t macOS || tmux new -s macOS"
-alias jserve="bundle exec jekyll serve"
 
 # ls
 alias ls='ls -GFh'
 alias l='ls -GFhl'
 alias ll='ls -lah'
 
-# Directories
-alias wk='cd ~/Workspace/'
-alias gth='cd ~/Workspace/github.com'
-alias iib='cd ~/Workspace/github.com/IIBB'
-alias rpl='cd ~/Workspace/ravenpoly.com'
-alias cdapp='cd ~/Workspace/ravenpoly.com/seasonal'
-alias cdcms='cd ~/Workspace/ravenpoly.com/cloud-core-service'
+# cd & mkdir
+mkcd ()
+{
+  mkdir -p -- "$1" &&
+  cd -P -- "$1"
+}
 
-# SSH
-alias vmi='ssh sysowner@207.180.248.147'
+# Directories
+alias wk='cd ~/workspace/'
+alias lm='cd ~/workspace/logmetrix'
+alias lma='cd ~/workspace/log-metrix-api'
 
 # ADB
 alias adbd='adb devices'
 alias adbk='adb kill-server'
 alias adbs='adb start-server'
 alias adbks='adb kill-server && adb start-server'
-alias apk="adb -s '2248670c1f037ece' install -r -g $1"
-alias htc10='adb connect 192.168.90.10:5555'
 
 # Recursively delete `.DS_Store` files
 alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
-
-# Empty the Trash on all mounted volumes and the main HDD.
-# Also, clear Apple’s System Logs to improve shell startup speed.
-# Finally, clear download history from quarantine. https://mths.be/bum
-alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl; sqlite3 ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV* 'delete from LSQuarantineEvent'"
-
-# Show/hide hidden files in Finder
-alias show="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
-alias hide="defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder"
-
-# Hide/show all desktop icons (useful when presenting)
-alias hidedesktop="defaults write com.apple.finder CreateDesktop -bool false && killall Finder"
-alias showdesktop="defaults write com.apple.finder CreateDesktop -bool true && killall Finder"
-
-# http://xkcd.com/530/
-alias stfu="osascript -e 'set volume output muted true'"
-alias pumpitup="osascript -e 'set volume output volume 100'"
-
-# Lock the screen (when going AFK)
-alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
 
 # Kill all the tabs in Chrome to free up memory
 # [C] explained: http://www.commandlinefu.com/commands/view/402/exclude-grep-from-your-grepped-output-of-ps-alias-included-in-description
@@ -72,11 +49,10 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 alias dockerips="docker ps -q | xargs -n 1 docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}} {{ .Name }}' | sed 's/ \// /'"
 
 ##### git
+alias gcy='yarn git-cz'
 alias gac='gaa && gcm'
 alias gii="gi && gac 'Initial commit'"
 alias grao='git remote add origin'
 alias gpoa='git push -u origin --all'
-##### Commitizen
-alias gcz='git cz'
 ##### sync all branches with remote
 alias gitsync="git branch -r | grep -v '\->' | while read remote; do git branch --track "${remote#origin/}" "$remote"; done && git pull --all"

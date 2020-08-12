@@ -1,10 +1,8 @@
 # If you come from bash you might have to change your $PATH.
-export PATH=$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
-# Put programs on `/etc/paths.d/` in the PATH
-eval `/usr/libexec/path_helper -s`
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$HOME/.local/bin:$PATH"
 
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/lucas/.oh-my-zsh"
+export ZSH="/home/vienna/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -28,7 +26,6 @@ ZSH_THEME="spaceship"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git
-  tmux
   golang
   node
   docker
@@ -53,7 +50,11 @@ else
 fi
 
 # ssh
-export SSH_KEY_PATH="~/.ssh/rsa_id"
+export SSH_KEY_PATH="~/.ssh/id_ed25519"
+
+# enable GPG signing
+export GPG_TTY=$(tty)
+export GPG_AGENT_INFO=${HOME}/.gnupg/S.gpg-agent:0:1
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
@@ -63,29 +64,6 @@ if [ -f ~/.zsh_aliases ]; then
     . ~/.zsh_aliases
 fi
 
-# gpg ioctl fix
-export GPG_TTY=$(tty)
-
-# Create a JAVA_HOME variable, determined dynamically. Not. It's slow. Set it manually
-# export JAVA_HOME=$(/usr/libexec/java_home)
-export JAVA_HOME="/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home"
-export PATH=$PATH:${JAVA_HOME}/bin
-
-# Set Android_HOME
-export ANDROID_HOME=~/Library/Android/sdk
-# Add the Android SDK to the ANDROID_HOME variable
-export PATH=$PATH:$ANDROID_HOME/platform-tools
-export PATH=$PATH:$ANDROID_HOME/tools
-export PATH=$PATH:$ANDROID_HOME/tools/bin
-export PATH=$PATH:$ANDROID_HOME/emulator
-export PATH=$PATH:$ANDROID_HOME/build-tools/28.0.3
-# Set GRADLE_HOME
-# The line below is an automated version finder. However, awk takes a fuckload of time to run
-# export GRADLE_HOME=$(brew info gradle | grep /usr/local/Cellar/gradle | awk '{print $1}')
-# Therefore we manually set the home var to the brew prefix
-export GRADLE_HOME="/usr/local/opt/gradle/libexec"
-export PATH=$PATH:$GRADLE_HOME/bin
-
 # Set GOPATH and GOROOT
 export GOPATH="$HOME/.go"
 export GOBIN="$GOPATH/bin"
@@ -94,21 +72,12 @@ export GOBIN="$GOPATH/bin"
 export GOROOT="/usr/local/opt/go/libexec"
 export PATH="$PATH:$GOPATH/bin:$GOROOT/bin"
 
-# app deployment via fastlane
-export PATH="$PATH:$HOME/.fastlane/bin"
-
-# flutter SDK
-export PATH="$PATH:/usr/local/share/flutter/bin"
-
-# brew kegs that we want to replace the system tools with
-export PATH="/usr/local/opt/curl/bin:$PATH"               # curl
-export PATH="/usr/local/opt/ruby/bin:$PATH"               # ruby
-export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH" # sed
-export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"    # grep, egrep, fgrep
-
-# keg-ruby gems must also be added to PATH
-export PATH="$PATH:/usr/local/lib/ruby/gems/2.6.0/bin"
-
 # add custom n path
 export N_PREFIX="$HOME/.n"
 export PATH="$N_PREFIX/bin:$PATH"
+
+# make sure node is available as nodejs
+alias nodejs=node
+
+# docker
+export DOCKER_HOST=tcp://localhost:2375
