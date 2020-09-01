@@ -14,11 +14,17 @@ alias vimdiff='nvim -d'
 alias pping='prettyping'
 alias gkeys='gpg --list-secret-keys --keyid-format LONG'
 alias tree="tree -a -I '.git'"
+alias teos='tmux new-session -A -s eOS'
 
 # ls
 alias ls='ls -GFh'
 alias l='ls -GFhl'
 alias ll='ls -lah'
+
+# yarn
+alias ys='yarn start'
+alias yt='yarn test'
+alias ysb='yarn storybook'
 
 # cd & mkdir
 mkcd ()
