@@ -1,7 +1,7 @@
 [user]
 	name = Lucas Vienna
-	email = dev@lucasvienna.dev
-	signingkey = 5FABA146D4759738
+	email = Lucas.Vienna@dscsag.com
+	signingkey = 4860F3E1AE8ADE1D
 [commit]
 	gpgsign = true
 [core]
@@ -10,7 +10,7 @@
 	excludesfile = ~/.gitignore_global
 
 [credential]
-	helper = store
+	helper = /mnt/c/Program\\ Files/Git/mingw64/libexec/git-core/git-credential-manager.exe
 
 [gpg]
 	program = gpg

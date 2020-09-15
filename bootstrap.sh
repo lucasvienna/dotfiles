@@ -19,14 +19,23 @@ function spaceship() {
   fi
 }
 
-function italicTerm() {
-  tic -x terminfo/xterm-256color-italic.terminfo
-  tic -x terminfo/tmux-256color.terminfo
+function zshPlugs() {
+  if [ -d "$ZSH/custom/plugins/zsh-syntax-highlighting" ]
+  then
+    echo "zsh-syntax-highlighting is already installed, skipping..."
+  else
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+  fi
+
+  if [ -d "$ZSH/custom/plugins/zsh-autosuggestions" ]
+  then
+    echo "zsh-autosuggestions is already installed, skipping..."
+  else
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+  fi
 }
 
 function doIt() {
-  # install homebrew
-  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   # install vim-plug
   curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -48,24 +57,24 @@ function doIt() {
   # install tpm
   git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
+  # get them sweet oh-my-zsh plugins going
+  zshPlugs
+
   # launch the spaceship
   spaceship
 }
 
 if [ "$1" == "--force" -o "$1" == "-f" ]; then
   doIt
-  italicTerm
   ./brew.sh
 else
   read -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1;
   echo "";
   if [[ $REPLY =~ ^[Yy]$ ]]; then
     doIt
-    italicTerm
     ./brew.sh
   fi;
 fi;
 
 unset doIt
-unset italicTerm
 unset spaceship

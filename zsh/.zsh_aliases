@@ -15,6 +15,9 @@ alias pping='prettyping'
 alias gkeys='gpg --list-secret-keys --keyid-format LONG'
 alias tree="tree -a -I '.git'"
 alias teos='tmux new-session -A -s eOS'
+# windows fuckery
+alias open="explorer.exe"
+alias copy="clip.exe"
 
 # ls
 alias ls='ls -GFh'
@@ -34,9 +37,10 @@ mkcd ()
 }
 
 # Directories
-alias wk='cd ~/workspace/'
-alias lm='cd ~/workspace/logmetrix'
-alias lma='cd ~/workspace/log-metrix-api'
+alias wk='cd ~/Workspace/'
+alias glab='cd ~/Workspace/gitlab.dscsag.net/'
+alias cloud='cd ~/Workspace/gitlab.dscsag.net/cloud/'
+alias lm='cd ~/Workspace/gitlab.dscsag.net/cloud/log-metrix/'
 
 # ADB
 alias adbd='adb devices'

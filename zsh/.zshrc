@@ -2,7 +2,7 @@
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$HOME/.local/bin:$PATH"
 
 # Path to your oh-my-zsh installation.
-export ZSH="/home/vienna/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -26,7 +26,7 @@ ZSH_THEME="spaceship"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git
-  golang
+  ssh-agent
   node
   docker
   docker-compose
@@ -54,7 +54,6 @@ export SSH_KEY_PATH="~/.ssh/id_ed25519"
 
 # enable GPG signing
 export GPG_TTY=$(tty)
-export GPG_AGENT_INFO=${HOME}/.gnupg/S.gpg-agent:0:1
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
@@ -72,9 +71,11 @@ export GOBIN="$GOPATH/bin"
 export GOROOT="/usr/local/opt/go/libexec"
 export PATH="$PATH:$GOPATH/bin:$GOROOT/bin"
 
-# add custom n path
-export N_PREFIX="$HOME/.n"
-export PATH="$N_PREFIX/bin:$PATH"
+# Set the java stuff
+export JAVA_HOME="/usr/lib/jvm/default-java"
+export PATH="$PATH:$JAVA_HOME/bin"
+
+export N_PREFIX="$HOME/n"; [[ :$PATH: == *":$N_PREFIX/bin:"* ]] || PATH+=":$N_PREFIX/bin"  # Added by n-install (see http://git.io/n-install-repo).
 
 # make sure node is available as nodejs
 alias nodejs=node
