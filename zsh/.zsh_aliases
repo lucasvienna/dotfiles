@@ -50,6 +50,7 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 
 # Docker
 alias dockerips="docker ps -q | xargs -n 1 docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}} {{ .Name }}' | sed 's/ \// /'"
+alias dlf="docker logs -f elasticsearch"
 
 ##### git
 alias gcy='yarn git-cz'
