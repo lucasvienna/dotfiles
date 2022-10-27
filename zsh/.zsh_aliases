@@ -15,19 +15,11 @@ alias pping='prettyping'
 alias gkeys='gpg --list-secret-keys --keyid-format LONG'
 alias tree="tree -a -I '.git'"
 alias teos='tmux new-session -A -s eOS'
-# windows fuckery
-alias open="explorer.exe"
-alias copy="clip.exe"
 
 # ls
 alias ls='ls -GFh'
 alias l='ls -GFhl'
 alias ll='ls -lah'
-
-# yarn
-alias ys='yarn start'
-alias yt='yarn test'
-alias ysb='yarn storybook'
 
 # cd & mkdir
 mkcd ()
@@ -37,6 +29,7 @@ mkcd ()
 }
 
 # Directories
+alias th='cd ~/thesis_es/'
 alias wk='cd ~/Workspace/'
 alias glab='cd ~/Workspace/gitlab.dscsag.net/'
 alias cloud='cd ~/Workspace/gitlab.dscsag.net/cloud/'

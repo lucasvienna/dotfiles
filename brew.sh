@@ -6,10 +6,6 @@
 echo "Installing packages..."
 
 
-# Make sure we have the necessary keys and repos
-curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-
 # Make sure we’re using the latest software.
 sudo apt update
 
@@ -51,43 +47,8 @@ sudo apt install -y neovim
 
 
 # -------------------------------
-# Programming languages
-# -------------------------------
-sudo apt install -y golang-go python3
-
-
-# -------------------------------
 # Miscelaneous Tools
 # -------------------------------
 sudo apt install -y git git-flow
 sudo apt install -y prettyping
 sudo apt install -y tree
-sudo apt install --no-install-recommends -y yarn
-
-
-# -------------------------------
-# Casks
-# -------------------------------
-# Java OpenJDK
-brew cask install adoptopenjdk8
-
-# Dev utilities
-brew cask install docker
-brew cask install fastlane
-brew cask install android-studio
-brew cask install alfred
-
-# Browsers
-brew cask install google-chrome
-brew cask install firefox
-
-# Communication
-brew cask install slack
-brew cask install skype
-brew cask install discord
-
-# -------------------------------
-# Post-Install
-# -------------------------------
-# Remove outdated versions from the cellar.
-brew cleanup

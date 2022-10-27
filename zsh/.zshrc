@@ -63,22 +63,6 @@ if [ -f ~/.zsh_aliases ]; then
     . ~/.zsh_aliases
 fi
 
-# Set GOPATH and GOROOT
-export GOPATH="$HOME/.go"
-export GOBIN="$GOPATH/bin"
-# Just like gradle, the line below is an automated version finder. It's also slow.
-# export GOROOT="$(brew --prefix golang)/libexec"
-export GOROOT="/usr/local/opt/go/libexec"
-export PATH="$PATH:$GOPATH/bin:$GOROOT/bin"
-
 # Set the java stuff
 export JAVA_HOME="/usr/lib/jvm/default-java"
 export PATH="$PATH:$JAVA_HOME/bin"
-
-export N_PREFIX="$HOME/n"; [[ :$PATH: == *":$N_PREFIX/bin:"* ]] || PATH+=":$N_PREFIX/bin"  # Added by n-install (see http://git.io/n-install-repo).
-
-# make sure node is available as nodejs
-alias nodejs=node
-
-# docker
-export DOCKER_HOST=tcp://localhost:2375
