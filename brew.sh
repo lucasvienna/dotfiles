@@ -52,3 +52,4 @@ sudo apt install -y neovim
 sudo apt install -y git git-flow
 sudo apt install -y prettyping
 sudo apt install -y tree
+sudo apt install -y zsh

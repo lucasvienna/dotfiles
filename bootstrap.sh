@@ -5,7 +5,7 @@
 
 cd $(dirname "${BASH_SOURCE}");
 
-git pull origin master
+git pull
 
 function spaceship() {
   # This installs the spaceship theme for zsh
