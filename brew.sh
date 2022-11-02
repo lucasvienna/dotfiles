@@ -16,40 +16,43 @@ sudo apt upgrade -y
 # -------------------------------
 # CLI Tools
 # -------------------------------
+sudo apt install -y \
 # Install GNU core utilities
-sudo apt install -y coreutils
+  coreutils \ 
 
 # Install GNU `find`, `locate`, `updatedb`, `xargs`, `sed`. All `g`-prefixed.
-sudo apt install -y findutils
+  findutils \
 
 # Install more recent versions of some tools.
-sudo apt install -y grep openssl cmake
+  grep openssl cmake \
 
 # Install stow for handling symlinks
-sudo apt install -y stow
+  stow \
 
 # Install `wget` and `curl`.
-sudo apt install -y wget curl
+  wget curl \
 
 # Install GnuPG to enable PGP-signing commits.
 # Also install pinentry so it works with Source Tree
-sudo apt install -y gnupg pinentry-curses
+  gnupg pinentry-curses \
 
 # tmux - terminal multiplexer
-sudo apt install -y tmux
+  tmux \
 
 # silver searcher, enhances fzf
-sudo apt install -y silversearcher-ag
+  silversearcher-ag \
 
 # God bless the best text editor on earth
 # Change the user's life forever
-sudo apt install -y neovim
+  neovim
 
 
 # -------------------------------
 # Miscelaneous Tools
 # -------------------------------
-sudo apt install -y git git-flow
-sudo apt install -y prettyping
-sudo apt install -y tree
-sudo apt install -y zsh
+sudo apt install -y \
+  git \
+  git-flow \
+  prettyping \
+  tree \
+  zsh
