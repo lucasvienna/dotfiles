@@ -10,12 +10,12 @@ git pull origin master
 function spaceship() {
   # This installs the spaceship theme for zsh
   # https://github.com/denysdovhan/spaceship-prompt
-  if [ -d "$ZSH/custom/themes/spaceship-prompt" ]
+  if [ -d "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/custom/themes/spaceship-prompt" ]
   then
     echo "spaceship-prompt is already installed, skipping..."
   else
-    git clone https://github.com/denysdovhan/spaceship-prompt.git "$ZSH/custom/themes/spaceship-prompt"
-    ln -s "$ZSH/custom/themes/spaceship-prompt/spaceship.zsh-theme" "$ZSH/custom/themes/spaceship.zsh-theme"
+    git clone https://github.com/denysdovhan/spaceship-prompt.git "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/custom/themes/spaceship-prompt"
+    ln -s "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/custom/themes/spaceship-prompt/spaceship.zsh-theme" "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/custom/themes/spaceship.zsh-theme"
   fi
 }
 

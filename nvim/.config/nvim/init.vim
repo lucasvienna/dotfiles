@@ -45,7 +45,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'editorconfig/editorconfig-vim'
 
 " semantic-based completion
-Plug 'Valloric/YouCompleteMe', { 'do': './install.py --go-completer'}
+Plug 'Valloric/YouCompleteMe', { 'do': './install.py --ts-completer'}
 
 " linting engine
 Plug 'w0rp/ale'
