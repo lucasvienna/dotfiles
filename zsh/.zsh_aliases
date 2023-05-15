@@ -1,6 +1,5 @@
 # ZSH config
 alias zshconf='nvim ~/.zshrc'
-alias tmuxconf='nvim ~/.tmux.conf'
 alias vimconf='nvim ~/.config/nvim/init.vim'
 alias aliases='nvim ~/.zsh_aliases && source ~/.zsh_aliases'
 alias ohmyzsh='nvim ~/.oh-my-zsh'
@@ -14,7 +13,6 @@ alias vimdiff='nvim -d'
 alias pping='prettyping'
 alias gkeys='gpg --list-secret-keys --keyid-format LONG'
 alias tree="tree -a -I '.git'"
-alias teos='tmux new-session -A -s eOS'
 # windows fuckery
 alias open="explorer.exe"
 alias copy="clip.exe"
@@ -24,11 +22,6 @@ alias ls='ls -GFh'
 alias l='ls -GFhl'
 alias ll='ls -lah'
 
-# yarn
-alias ys='yarn start'
-alias yt='yarn test'
-alias ysb='yarn storybook'
-
 # cd & mkdir
 mkcd ()
 {
@@ -37,10 +30,12 @@ mkcd ()
 }
 
 # Directories
-alias wk='cd ~/Workspace/'
-alias glab='cd ~/Workspace/gitlab.dscsag.net/'
-alias cloud='cd ~/Workspace/gitlab.dscsag.net/cloud/'
-alias lm='cd ~/Workspace/gitlab.dscsag.net/cloud/log-metrix/'
+alias wk='cd ~/workspace/'
+alias pdi='/home/lvi/workspace/local-dev/bin/local-dev'
+alias pdia='cd ~/workspace/apps'
+alias pdis='cd ~/workspace/product-data-integration-service'
+alias pdid='cd ~/workspace/local-dev'
+alias pdij='cd ~/workspace/java-parent/'
 
 # ADB
 alias adbd='adb devices'
@@ -59,7 +54,6 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 alias dockerips="docker ps -q | xargs -n 1 docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}} {{ .Name }}' | sed 's/ \// /'"
 
 ##### git
-alias gcy='yarn git-cz'
 alias gac='gaa && gcm'
 alias gii="gi && gac 'Initial commit'"
 alias grao='git remote add origin'

@@ -1,6 +1,7 @@
 [user]
 	name = Lucas Vienna
 	email = Lucas.Vienna@dscsag.com
+	signingKey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINEIpmvuhdgqsq153BBd/VW6j2KivxeOjLdEfqK85F/O lucas.vienna@dscsag.com
 
 [commit]
 	gpgsign = true
@@ -11,10 +12,15 @@
 	excludesfile = ~/.gitignore_global
 
 [credential]
-	helper = /mnt/c/Program\\ Files/Git/mingw64/libexec/git-core/git-credential-manager.exe
+	helper = /mnt/c/Program\\ Files/Git/mingw64/bin/git-credential-manager.exe
 
 [gpg]
+	format = ssh
 	program = gpg
+
+[tag]
+	forceSignAnnotated = true
+	gpgsign = true
 
 [merge]
 	tool = vimdiff
@@ -36,8 +42,9 @@
 	########
 	dev = !git checkout develop && git pull origin develop
 	staging = !git checkout staging && git pull origin staging
-	master = !git checkout master && git pull origin
+	main = !git checkout main && git pull origin
 	########
 	aliases = !git config -l | grep alias | cut -c 7-
-[tag]
-	forceSignAnnotated = true
+
+[gpg "ssh"]
+	allowedSignersFile = /home/lvi/.config/git/allowed_signers
