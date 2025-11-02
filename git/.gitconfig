@@ -11,6 +11,7 @@
 	gpgsign = true
 [tag]
 	forceSignAnnotated = true
+	sort = version:refname
 
 [core]
 	editor = nvim
@@ -18,9 +19,12 @@
 	excludesfile = ~/.gitignore_global
 [init]
 	defaultBranch = main
+[column]
+	ui = auto
 
 [merge]
 	tool = vimdiff
+		conflictstyle = zdiff3
 [mergetool]
 	prompt = false
 [mergetool "vimdiff"]
@@ -28,11 +32,30 @@
 
 [diff]
 	tool = vimdiff
+	algorithm = histogram
+	colorMoved = plain
+	mnemonicPrefix = true
+	renames = true
 [difftool]
 	prompt = false
 
+[fetch]
+	prune = true
+	pruneTags = true
+	all = true
 [pull]
 	rebase = true
+[push]
+	default = simple
+	autoSetupRemote = true
+	followTags = true
+[rebase]
+	autoSquash = true
+	autoStash = true
+	updateRefs = true
+[rerere]
+	enabled = true
+	autoupdate = true
 
 [alias]
 	aliases = !git config -l | grep alias | cut -c 7-
