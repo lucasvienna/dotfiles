@@ -3,11 +3,13 @@
 # This script comes from Mathias Bynens with slight modifications made by lucasfcosta and me
 # https://github.com/mathiasbynens/dotfiles/blob/bb6c76e410bf7b1693edfe60239461fc9205ec02/brew.sh
 
+# Mute annoying env hints during automated install
+HOMEBREW_NO_ENV_HINTS=1
+
 echo "Installing brew formulae..."
 
 # Tap any casks we'll need later
-brew tap dart-lang/dart
-brew tap AdoptOpenJDK/openjdk
+brew tap derailed/k9s
 
 # Make sure we’re using the latest Homebrew.
 brew update
@@ -42,11 +44,8 @@ brew install wget curl
 # Also install pinentry so it works with Source Tree
 brew install gnupg pinentry-mac
 
-# tmux - terminal multiplexer
-brew install tmux
-
-# Enables macOS clipboard interactions from inside tmux
-brew install reattach-to-user-namespace
+# Better CLI tools
+brew install fzf fd ripgrep
 
 # silver searcher, enhances fzf
 brew install the_silver_searcher
@@ -56,65 +55,95 @@ brew install the_silver_searcher
 # It is also a good CLI tool
 brew install ag
 
-# God bless the best text editor on earth
-# Change the user's life forever
+# Btw I use vim
 brew install neovim
 
 
 # -------------------------------
 # Programming languages
 # -------------------------------
-brew install dart go python3
+brew install flutter go python
 
 
 # -------------------------------
-# Docker Suite
+# Containerisation Tools
 # -------------------------------
-brew install docker docker-compose docker-machine
+brew install --cask orbstack
+brew install kubectl helm derailed/k9s/k9s
 
 
 # -------------------------------
 # Flutter
 # -------------------------------
 brew install gradle
-brew install --HEAD usbmuxd
-brew link usbmuxd
-brew install --HEAD libimobiledevice
-brew install ideviceinstaller ios-deploy cocoapods
+# Unused for the moment, keep commented out
+# brew install --HEAD usbmuxd
+# brew link usbmuxd
+# brew install --HEAD libimobiledevice
+# brew install ideviceinstaller ios-deploy cocoapods
+# brew install fastlane
 
 # -------------------------------
 # Miscelaneous Tools
 # -------------------------------
-brew install git git-flow
-brew install prettyping
-brew install ssh-copy-id
-brew install tree
-brew install yarn --without-node
+brew install git lazygit
+brew install prettyping bat tree ssh-copy-id
+brew install mas
 
 
 # -------------------------------
 # Casks
 # -------------------------------
-# Java OpenJDK
-brew cask install adoptopenjdk8
 
 # Dev utilities
-brew cask install docker
-brew cask install fastlane
-brew cask install android-studio
-brew cask install alfred
+brew install --cask jetbrains-toolbox
+brew install --cask ghostty warp
+brew install --cask sublime-merge sublime-text
 
-# Browsers
-brew cask install google-chrome
-brew cask install firefox
+# Apps & Productivity
+brew install --cask arc
+brew install --cask alfred
+brew install --cask obsidian
+brew install --cask 1password
+brew install 1password-cli
 
 # Communication
-brew cask install slack
-brew cask install skype
-brew cask install discord
+brew install --cask discord signal
 
 # -------------------------------
 # Post-Install
 # -------------------------------
 # Remove outdated versions from the cellar.
 brew cleanup
+
+
+# -------------------------------
+# macOS App Store
+# -------------------------------
+
+# Browser Extensions
+mas install 1569813296  # 1Password for Safari
+mas install 6504861501  # Ghostery Privacy Ad Blocker
+mas install 1573461917  # SponsorBlock
+mas install 1458969831  # JSON Peep
+
+# Productivity Apps
+mas install 409183694   # Keynote
+mas install 409203825   # Numbers
+mas install 409201541   # Pages
+
+# Utilities
+mas install 1534275760  # LanguageTool
+mas install 441258766   # Magnet
+
+# Communication
+mas install 310633997   # WhatsApp
+
+# Media Editing
+mas install 634148309   # Logic Pro
+mas install 424389933   # Final Cut Pro
+
+# Development Tools
+mas install 640199958   # Developer
+mas install 899247664   # TestFlight
+mas install 497799835   # Xcode
