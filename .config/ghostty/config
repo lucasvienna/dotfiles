@@ -1,0 +1,18 @@
+font-family = CaskaydiaCove Nerd Font
+font-size = 14
+font-feature = -calt, -liga, -dlig
+
+cursor-style-blink = false
+cursor-text = #000000
+
+maximize = true
+window-padding-x = 2
+window-padding-balance = true
+
+keybind = shift+enter=text:\x1b\r
+
+# Load theme.
+config-file = ?theme
+
+# Load a custom config for overrides, ? silently fails if the file is missing.
+config-file = ?config.local
