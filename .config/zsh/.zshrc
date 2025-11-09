@@ -1,10 +1,8 @@
-# If you come from bash you might have to change your $PATH.
-export PATH="$HOME/.local/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 # Put programs on `/etc/paths.d/` in the PATH
 # eval `/usr/libexec/path_helper -s`
 
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/vienna/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -32,8 +30,9 @@ if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
     vscode
     sublime
     sublime-merge
+    fzf-tab
     zsh-autosuggestions
-    zsh-syntax-highlighting
+    fast-syntax-highlighting
   )
 else
   plugins=(
@@ -43,6 +42,7 @@ else
     vscode
     sublime
     sublime-merge
+    fzf-tab
   )
 fi
 
@@ -57,25 +57,16 @@ else
   export EDITOR='nvim'
 fi
 
+# fnm
+eval "$(fnm env --use-on-cd --version-file-strategy=recursive --resolve-engines --shell zsh)"
+
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of actie aliases, run `alias`.
-if [ -f ~/.zsh_aliases ]; then
-    . ~/.zsh_aliases
-fi
+# For a full list of active aliases, run `alias`.
+[ -f "${XDG_CONFIG_HOME}/zsh/.aliases" ] && . "${XDG_CONFIG_HOME}/zsh/.aliases"
 
-# ruby gems
-export PATH="$HOME/.gem/bin:$PATH"
+# Load local settings if they exist.
+[ -f "${XDG_CONFIG_HOME}/zsh/.zshrc.local" ] && . "${XDG_CONFIG_HOME}/zsh/.zshrc.local"
+if [ -f "${XDG_CONFIG_HOME}/zsh/.aliases.local" ]; then . "${XDG_CONFIG_HOME}/zsh/.aliases.local"; fi
 
-# rust
-export PATH="$HOME/.cargo/bin:$PATH"
-
-# brew kegs that we want to replace the system tools with
-export PATH="/usr/local/opt/curl/bin:$PATH"               # curl
-export PATH="/usr/local/opt/ruby/bin:$PATH"               # ruby
-export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH" # sed
-export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"    # grep, egrep, fgrep
-
-# fnm
-eval "$(fnm env --use-on-cd --version-file-strategy=recursive --resolve-engines --shell zsh)"

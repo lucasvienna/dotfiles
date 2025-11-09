@@ -1,7 +1,8 @@
+# shellcheck shell=bash
+
 # ZSH config
-alias zshconf='nvim ~/.zshrc'
+alias zshconf='nvim $ZDOTDIR/.zshrc'
 alias tmuxconf='nvim ~/.tmux.conf'
-alias vimconf='nvim ~/.config/nvim/init.vim'
 alias aliases='nvim ~/.zsh_aliases && source ~/.zsh_aliases'
 alias ohmyzsh='nvim ~/.oh-my-zsh'
 
@@ -19,7 +20,7 @@ alias tree="tree -a -I '.git'"
 # ls
 alias ls='ls -GFh'
 alias l='ls -GFhl'
-alias ll='ls -lah'
+alias ll='ls -Gahl'
 
 # Directories
 alias wk='cd ~/Workspace/'
@@ -29,11 +30,11 @@ alias emp='cd ~/Workspace/NeonRook/empire'
 alias rlm='cd ~/Workspace/NeonRook/realm'
 
 # Terraform/Terramate
-alias tm=terramate
-alias tf=tofu
-alias tmr="terramate script run"
-alias tmg="terramate generate"
-alias tfmt="terramate fmt; tofu fmt -recursive"
+alias tm="terramate"
+alias tf="tofu"
+alias tmr="tm script run"
+alias tmg="tm generate"
+alias tfmt="tm fmt; tofu fmt -recursive"
 
 # Recursively delete `.DS_Store` files
 alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
@@ -71,4 +72,4 @@ alias gii="gi && gac 'Initial commit'"
 alias grao='git remote add origin'
 alias gpoa='git push -u origin --all'
 ##### sync all branches with remote
-alias gitsync="git branch -r | grep -v '\->' | while read remote; do git branch --track "${remote#origin/}" "$remote"; done && git pull --all"
+alias gitsync="git branch -r | grep -v '\->' | while read remote; do git branch --track \"${remote#origin/}\" \"$remote\"; done && git pull --all"

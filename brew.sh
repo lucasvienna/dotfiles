@@ -135,6 +135,7 @@ mas install 409201541   # Pages
 # Utilities
 mas install 1534275760  # LanguageTool
 mas install 441258766   # Magnet
+mas install 1527619437  # maccy
 
 # Communication
 mas install 310633997   # WhatsApp
