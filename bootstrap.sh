@@ -22,14 +22,14 @@ function stowit() {
   usr=$1
   app=$2
   # -v verbose
-  # -R recursive
+  # -R restow (undo + redo)
   # -t target
-  stow -v -R -t ${usr} ${app}
+  stow -verbose --restow -t "${usr}" "${app}"
 }
 
 function doIt() {
   # install homebrew
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   # install oh-my-zsh
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
   git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
@@ -43,8 +43,7 @@ function doIt() {
   stowit ~ nvim
   stowit ~ zsh
 
-  # install nvim plugins and python addon
-  pip3 install --user --upgrade neovim
+  # install nvim plugins
   nvim --headless '+Lazy install' +qall
 
   # install tpm
