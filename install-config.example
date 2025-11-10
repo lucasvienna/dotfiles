@@ -42,7 +42,6 @@ export APT_PACKAGES_EXTRAS=
 #
 # If you don't want to install any default packages then you can use a single
 # quoted space as the value, for example: export BREW_CASK_PACKAGES=" "
-export BREW_TAPS=
 export BREW_PACKAGES=
 export BREW_PACKAGES_EXTRAS=
 export BREW_CASK_PACKAGES=
@@ -92,6 +91,7 @@ export SYMLINKS_EXTRAS=
 
 # Symlinks that will get created only in WSL.
 export SYMLINKS_WSL=(
+  "cp \"\${DOTFILES_PATH}/wsl/.wslconfig\" \"/mnt/c/Users/%WindowsUser/.wslconfig\" || true"
   "sudo ln -fns \"\${DOTFILES_PATH}/etc/wsl.conf\" \"/etc/wsl.conf\""
 )
 export SYMLINKS_WSL_EXTRAS=

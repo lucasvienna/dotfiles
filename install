@@ -753,12 +753,6 @@ EOF
         done
       fi
 
-      if [ "${OS_DISTRO}" = "arch" ]; then
-        for link in "${symlinks_arch[@]}"; do
-          eval "${link}"
-        done
-      fi
-
       break
       ;;
     [Nn]*)
@@ -1408,4 +1402,3 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   healthcheck
   completed_message
 fi
-
