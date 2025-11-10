@@ -130,6 +130,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     sublime-merge
     sublime-text
     warp
+    yaak
   }
   "
   BREW_CASK_PACKAGES_EXTRAS="${BREW_CASK_PACKAGES_EXTRAS:-}"
@@ -152,10 +153,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 
   if [[ -z "${MISE_LANGUAGES[*]}" ]]; then
     declare -gA MISE_LANGUAGES
-    MISE_LANGUAGES["node"]="node@24.11"
-    MISE_LANGUAGES["bun"]="bun@1.3"
+    MISE_LANGUAGES["node"]="node@lts-krypton"
+    MISE_LANGUAGES["bun"]="bun@latest"
     MISE_LANGUAGES["python"]="python@3.14"
-    MISE_LANGUAGES["go"]="go@1.25"
+    MISE_LANGUAGES["go"]="go@latest"
     MISE_LANGUAGES["rust"]="rust@stable"
   fi
   declare -A MISE_LANGUAGES_EXTRAS="${MISE_LANGUAGES_EXTRAS:-}"
@@ -663,8 +664,8 @@ install_omz() {
   export omz_path="$HOME/.oh-my-zsh"
 
   if [ -f "$omz_path/tools/upgrade.sh" ]; then
-      echo "Already installed, updating"
-      sh -c "$omz_path/tools/upgrade.sh"
+    echo "Already installed, updating"
+    sh -c "$omz_path/tools/upgrade.sh"
   else
     curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -o "${install_tmp}"
 
@@ -1407,3 +1408,4 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   healthcheck
   completed_message
 fi
+
