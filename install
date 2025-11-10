@@ -656,6 +656,7 @@ install_fonts() {
     unzip "${font_zip}" -d "${font_tmp}"
 
     if [ -n "${OS_IN_WSL}" ]; then
+      rm "$font_tmp/LICENSE" "$font_tmp/README.md"
       cat <<EOF
 
 Since we're in WSL 2 and we need to install Windows fonts, please do it manually.
@@ -1411,17 +1412,17 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   install_packages
   clone_dotfiles
   install_fonts
-  ask_for_name
-  ask_for_email
-  configure_system_configs
-  configure_home_configs
-  configure_shell
-  configure_git
   install_omz
   install_omz_plugins
   stow_apps
+  configure_system_configs
+  configure_home_configs
+  configure_shell
+  ask_for_name
+  ask_for_email
   create_ssh_key
   create_gpg_key
+  configure_git
   install_programming_languages
   install_tmux_plugins
   install_nvim_plugins

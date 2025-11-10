@@ -18,6 +18,9 @@ fi
 # DISABLE_AUTO_UPDATE="true"
 zstyle ':omz:update' mode auto
 
+# make repository status checks for large repositories much, much faster
+DISABLE_UNTRACKED_FILES_DIRTY="true"
+
 # Which plugins would you like to load? Standard plugins can be found in ~/.oh-my-zsh/plugins/*
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
