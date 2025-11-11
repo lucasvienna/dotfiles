@@ -47,7 +47,6 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     aspell
     bc
     dnsutils
-    btop
     build-essential
     coreutils
     curl
@@ -69,7 +68,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     unzip
     wget
     whois
-    wl-clipboard
+    xclip
     xz-utils
     zip
     zsh
@@ -134,6 +133,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     ghostty
     obsidian
     orbstack
+    starship
     sublime-merge
     sublime-text
     warp
@@ -145,6 +145,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   MISE_PACKAGES_DEBIAN="${MISE_PACKAGES_DEBIAN:-
     1password
     aws-cli
+    btop
     fd
     fzf
     jq
@@ -156,6 +157,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     ripgrep
     shellcheck
     shfmt
+    starship
     terraform
     terramate
     yq

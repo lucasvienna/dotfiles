@@ -9,7 +9,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
-  ZSH_THEME="spaceship"
+  ZSH_THEME=""
 else
   ZSH_THEME="robbyrussell"
 fi
@@ -35,13 +35,15 @@ if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
     fzf-tab
     zsh-autosuggestions
     fast-syntax-highlighting
+    starship
   )
 else
   plugins=(
     git
     rust
     vscode
-    fzf-tab
+    sublime
+    sublime-merge
   )
 fi
 

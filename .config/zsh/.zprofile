@@ -48,9 +48,6 @@ export DIFFPROG="nvim -d"
 # tell homebrew to shut up
 export HOMEBREW_NO_ENV_HINTS=1
 
-# Golang
-export PATH="/usr/local/go/bin:$PATH"
-
 # rust
 export PATH="$HOME/.cargo/bin:$PATH"
 
