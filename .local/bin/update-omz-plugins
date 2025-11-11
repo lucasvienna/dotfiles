@@ -25,12 +25,5 @@ clone_or_pull "zdharma-continuum/fast-syntax-highlighting"
 clone_or_pull "zsh-users/zsh-autosuggestions"
 clone_or_pull "Aloxaf/fzf-tab"
 
-clone_or_pull "spaceship-prompt/spaceship-prompt" "themes"
-
-# Link, or re-link, the Spaceship prompt
-ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
-ln -fns "$ZSH_CUSTOM/themes/spaceship-prompt/spaceship.zsh-theme" "$ZSH_CUSTOM/themes/spaceship.zsh-theme"
-
-
 # this is cool, but let's skip for now
 # clone_or_pull "jeffreytse/zsh-vi-mode"
