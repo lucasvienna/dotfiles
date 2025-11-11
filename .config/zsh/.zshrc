@@ -29,6 +29,8 @@ if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
   plugins=(
     git
     rust
+    kubectl
+    helm
     vscode
     sublime
     sublime-merge
@@ -41,6 +43,8 @@ else
   plugins=(
     git
     rust
+    kubectl
+    helm
     vscode
     sublime
     sublime-merge
