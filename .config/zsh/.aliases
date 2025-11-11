@@ -1,26 +1,50 @@
 # shellcheck shell=bash
 
 # ZSH config
-alias zshconf='nvim $ZDOTDIR/.zshrc'
-alias tmuxconf='nvim ~/.tmux.conf'
-alias aliases='nvim ~/.zsh_aliases && source ~/.zsh_aliases'
+alias zconf='nvim $ZDOTDIR/.zshrc'
+alias tconf='nvim $HOME/.config/tmux/.tmux.conf'
+alias aliases='nvim $HOME/.config/zsh/.aliases && . $HOME/.config/zsh/.aliases'
 alias ohmyzsh='nvim ~/.oh-my-zsh'
+alias sz='. ${ZDOTDIR}/.zprofile && . ${ZDOTDIR}/.zshrc'
+alias dt='cd ${DOTFILES_PATH} && nvim .'
+alias lz='cd ${HOME}/.local/share/nvim/lazy/LazyVim && nvim .'
+alias lp='cd ${HOME}/.local/share/nvim/lazy && nvim .'
 
 # Reload the shell
 alias reload="omz reload"
 
 # Tooling
 alias pn="pnpm"
-alias vim='nvim'
 alias vimdiff='nvim -d'
-alias pping='prettyping'
+alias ping='ping -c 5'
+alias pping='prettyping -c 5'
 alias gkeys='gpg --list-secret-keys --keyid-format LONG'
 alias tree="tree -a -I '.git'"
+# safety net
+alias rm='rm -I --preserve-root'
+
+# System
+alias path='echo -e ${PATH//:/\\n}'
+alias sau="sudo apt update"
+alias sag="sudo apt upgrade"
+alias saug="sau && sag"
+
+# Kubernetes/Terraform/Terramate
+alias k="kubectl"
+alias tm="terramate"
+alias tf="tofu"
+alias tmr="tm script run"
+alias tmg="tm generate"
+alias tfmt="tm fmt; tofu fmt -recursive"
 
 # ls
 alias ls='ls -GFh'
 alias l='ls -GFhl'
 alias ll='ls -Gahl'
+
+# permissions
+alias 755d="find . -type d -exec chmod 755 {} \;"
+alias 644f="find . -type f -exec chmod 644 {} \;"
 
 # Directories
 alias wk='cd ~/Workspace/'
@@ -28,13 +52,6 @@ alias gth='cd ~/Workspace/github.com'
 alias nr='cd ~/Workspace/NeonRook'
 alias emp='cd ~/Workspace/NeonRook/empire'
 alias rlm='cd ~/Workspace/NeonRook/realm'
-
-# Terraform/Terramate
-alias tm="terramate"
-alias tf="tofu"
-alias tmr="tm script run"
-alias tmg="tm generate"
-alias tfmt="tm fmt; tofu fmt -recursive"
 
 # Recursively delete `.DS_Store` files
 alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
@@ -63,8 +80,15 @@ alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resource
 # [C] explained: http://www.commandlinefu.com/commands/view/402/exclude-grep-from-your-grepped-output-of-ps-alias-included-in-description
 alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v extension-process | tr -s ' ' | cut -d ' ' -f2 | xargs kill"
 
+# Networking
+alias myip="curl https://ifconfig.me; echo | tee clip-copy"
+alias ports="sudo lsof -i -P -n | grep LISTEN"
+
 # Docker
 alias dockerips="docker ps -q | xargs -n 1 docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}} {{ .Name }}' | sed 's/ \// /'"
+alias drun='docker container run --rm -it -v "${PWD}":/app -w /app'
+alias dclean="docker system prune -af"
+alias dlog="docker log -f"
 
 ##### git
 alias gac='gaa && gcm'
