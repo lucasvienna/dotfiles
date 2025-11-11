@@ -29,7 +29,6 @@ if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
   plugins=(
     git
     rust
-    volta
     vscode
     sublime
     sublime-merge
@@ -41,10 +40,7 @@ else
   plugins=(
     git
     rust
-    volta
     vscode
-    sublime
-    sublime-merge
     fzf-tab
   )
 fi
