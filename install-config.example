@@ -48,8 +48,8 @@ export BREW_CASK_PACKAGES=
 export BREW_CASK_PACKAGES_EXTRAS=
 
 # Install Mise packages for specific platforms. For example, maybe you want
-# the latest and greatest versions on Debian for a few tools but Arch and
-# macOS already have them so you don't need Mise packages there.
+# the latest and greatest versions on Debian for a few tools but macOS
+# already has them so you don't need Mise packages there.
 #
 # If you don't want to install any default packages then you can use a single
 # quoted space as the value, for example: export MISE_PACKAGES_DEBIAN=" "
