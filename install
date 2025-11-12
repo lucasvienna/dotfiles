@@ -27,6 +27,9 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   # is useful for testing in a container without committing anything.
   LOCAL="${LOCAL:-}"
 
+  # Skip confirmation before potentially destructive actions.
+  YYES="${YES:-}"
+
   # This will get optionally populated later, it essentially does a git pull
   # to pull in the latest changes locally.
   PULL=
@@ -34,6 +37,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   # This will get optionally populated later, it combines pulling in the latest
   # updates and running the install script.
   PULL_UPDATE=
+
+  # This will get optionally populated later, it skips most actions and redoes
+  # the symlinking.
+  ONLY_SYMLINKS=
 
   DOTFILES_REPO_SLUG="${DOTFILES_REPO_SLUG:-lucasvienna/dotfiles}"
   DOTFILES_CLONE_URL="${DOTFILES_CLONE_URL:-https://github.com/${DOTFILES_REPO_SLUG}}"
@@ -113,6 +120,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     shfmt
     stow
     hashicorp/tap/terraform
+    starship
     terramate
     the_silver_searcher
     tmux
@@ -136,7 +144,6 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     jetbrains-toolbox
     obsidian
     orbstack
-    starship
     sublime-merge
     sublime-text
     warp
@@ -296,7 +303,7 @@ _install_packages_macos() {
   fi
 
   if [[ -n "${BREW_CASK_PACKAGES}" || -n "${BREW_CASK_PACKAGES_EXTRAS}" ]]; then
-    brew install --cask ${BREW_CASK_PACKAGES} ${BREW_CASK_PACKAGES_EXTRAS}
+    brew install --cask --adopt ${BREW_CASK_PACKAGES} ${BREW_CASK_PACKAGES_EXTRAS}
   fi
 
   # Install Mise packages.
@@ -524,7 +531,7 @@ install_packages() {
     return
   fi
 
-  cat <<EOF
+  [ -z "$YYES" ] && cat <<EOF
 If you choose y, all of the system packages below will be installed:
 
 $(_display_packages)
@@ -534,11 +541,17 @@ If you choose no, the above packages will not be installed and this script
 will exit. This gives you a chance to edit the list of packages.
 
 EOF
+  [ -n "$YYES" ] && cat <<EOF
+The following system packages will be installed:
 
+$(_display_packages)
+
+EOF
   printf "You can edit 'config' to modify the package list.\n\n"
 
   while true; do
-    read -rp "Do you want to install the above packages? (y/n) " yn
+    [ -z "$YYES" ] && read -rp "Do you want to install the above packages? (y/n) " yn
+    [ -n "$YYES" ] && yn=y
     case "${yn}" in
     [Yy]*)
       if [ "${OS_TYPE}" == "linux" ]; then
@@ -741,7 +754,7 @@ stow_apps() {
     done
   fi
 
-  cat <<EOF
+  [ -z "$YYES" ] && cat <<EOF
 
 -------------------------------------------------------------------------------
 
@@ -759,7 +772,8 @@ type y and have existing files now would be a good time to back them up.
 EOF
 
   while true; do
-    read -rep "Ready to continue? Enter y to apply them all or n to skip (y/n) " yn
+    [ -z "$YYES" ] && read -rep "Ready to continue? Enter y to apply them all or n to skip (y/n) " yn
+    [ -n "$YYES" ] && yn=y
     case "${yn}" in
     [Yy]*)
       # Avoid using ln -T flag since it doesn't exist on macOS. We're being
@@ -1086,12 +1100,12 @@ configure_git() {
 EOF
 
     if [ "${OS_TYPE}" == "linux" ]; then
-      cat <<EOF >"${git_config_local_path}"
+      cat <<EOF >>"${git_config_local_path}"
 [gpg "ssh"]
   program = "/mnt/c/Users/LVI/AppData/Local/Microsoft/WindowsApps/op-ssh-sign-wsl.exe"
 EOF
     else
-      cat <<EOF >"${git_config_local_path}"
+      cat <<EOF >>"${git_config_local_path}"
 [gpg "ssh"]
   program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
 EOF
@@ -1329,6 +1343,12 @@ parse_args() {
   --update | -u)
     PULL_UPDATE=1
     ;;
+  --symlinks | -s)
+    ONLY_SYMLINKS=1
+    ;;
+  --yes | -y)
+    YYES=1
+    ;;
   --skip-system-packages | -S) ;;
   --help | -h)
     echo -e "$(
@@ -1410,6 +1430,13 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 
   check_prereqs
   create_initial_dirs
+
+  if [ -n "${ONLY_SYMLINKS}" ]; then
+    stow_apps
+    healthcheck
+    exit
+  fi
+
   install_packages
   clone_dotfiles
   install_fonts
