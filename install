@@ -719,7 +719,7 @@ install_omz_plugins() {
   "${DOTFILES_PATH}/.local/bin/update-omz-plugins"
 }
 
-stow_apps() {
+create_symlinks() {
   _info "STOWING APP PACKAGES"
 
   local symlinks=()
@@ -934,6 +934,9 @@ EOF
     echo "${shell_path}" | sudo tee -a /etc/shells 1>/dev/null
   fi
 
+  # symlink the newly created local files
+  stow -R -d "${DOTFILES_PATH}/.config" -t "${HOME}/.config/zsh" --ignore='(?<!\.local)$' zsh 2>/dev/null || true
+
   [ "${SHELL: -3}" != "zsh" ] && chsh -s "${shell_path}"
 
   # shellcheck disable=SC1091
@@ -1111,6 +1114,9 @@ EOF
 EOF
     fi
   fi
+
+  # symlink the newly created local file
+  stow -R -d "${DOTFILES_PATH}/.config" -t "${HOME}/.config/git" --ignore="^(config|ignore)$" git 2>/dev/null || true
 
   echo "It has been configured in '$(dirname "${git_config_local_path}")'"
 }
@@ -1432,7 +1438,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   create_initial_dirs
 
   if [ -n "${ONLY_SYMLINKS}" ]; then
-    stow_apps
+    create_symlinks
     healthcheck
     exit
   fi
@@ -1442,7 +1448,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   install_fonts
   install_omz
   install_omz_plugins
-  stow_apps
+  create_symlinks
   configure_system_configs
   configure_home_configs
   configure_shell
