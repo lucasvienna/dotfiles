@@ -1,22 +1,27 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-cd "$(dirname "${BASH_SOURCE}")" || exit
+# Install Homebrew
+echo "Installing Homebrew..."
+if ! NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; then
+  echo "Error: Homebrew installation failed" >&2
+  exit 1
+fi
 
-install_brew() {
-  # install homebrew
-  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# Detect Homebrew installation path
+if [ -f "/opt/homebrew/bin/brew" ]; then
+  BREW_PREFIX="/opt/homebrew"
+elif [ -f "/usr/local/bin/brew" ]; then
+  BREW_PREFIX="/usr/local"
+else
+  echo "Error: Homebrew binary not found after installation" >&2
+  exit 1
+fi
 
-  if [ -f "/opt/homebrew/bin/brew" ]; then
-    # Apple Silicon mac
-    eval "$(/opt/homebrew/bin/brew shellenv)" &&
-      brew install bash &&
-      bash
-  elif [ -f "/usr/local/bin/brew" ]; then
-    # Intel mac
-    eval "$(/usr/local/bin/brew shellenv)" &&
-      brew install bash &&
-      bash
-  fi
-}
+# Initialize brew environment and install bash
+echo "Installing latest bash..."
+eval "$("${BREW_PREFIX}/bin/brew" shellenv)"
+brew install bash
 
-install_brew
+echo "Switching to Homebrew bash for bootstrapping..."
+exec "${BREW_PREFIX}/bin/bash" "$@"

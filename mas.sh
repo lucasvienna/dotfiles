@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 OS_TYPE="$(uname | tr "[:upper:]" "[:lower:]")"
 
@@ -7,9 +8,16 @@ if [ "$OS_TYPE" != "darwin" ]; then
   exit 1
 fi
 
-if ! command -v "mas" 1>/dev/null; then
+if ! command -v "mas" &>/dev/null; then
   echo "mas needs to be installed for this script. Run './install' before trying again."
   printf ">> https://github.com/mas-cli/mas\n\n"
+  exit 1
+fi
+
+# Check if signed into Mac App Store
+if ! mas account &>/dev/null; then
+  echo "Error: You must be signed into the Mac App Store to install apps."
+  echo "Please open the App Store app, sign in, and try again."
   exit 1
 fi
 
@@ -19,34 +27,67 @@ fi
 
 echo "Installing macOS App Store applications..."
 
-# Browser Extensions
-mas install 1569813296 # 1Password for Safari
-mas install 6504861501 # Ghostery Privacy Ad Blocker
-mas install 1573461917 # SponsorBlock
-mas install 1458969831 # JSON Peep
+# Array of app IDs to install
+declare -A apps=(
+  # Browser Extensions
+  [1569813296]="1Password for Safari"
+  [6504861501]="Ghostery Privacy Ad Blocker"
+  [1573461917]="SponsorBlock"
+  [1458969831]="JSON Peep"
 
-# Productivity Apps
-mas install 409183694 # Keynote
-mas install 409203825 # Numbers
-mas install 409201541 # Pages
+  # Productivity Apps
+  [409183694]="Keynote"
+  [409203825]="Numbers"
+  [409201541]="Pages"
 
-# Utilities
-mas install 1534275760 # LanguageTool
-mas install 441258766  # Magnet
-mas install 1527619437 # maccy
+  # Utilities
+  [1534275760]="LanguageTool"
+  [441258766]="Magnet"
+  [1527619437]="maccy"
 
-# Communication
-mas install 310633997 # WhatsApp
+  # Communication
+  [310633997]="WhatsApp"
 
-# Media Editing
-mas install 634148309 # Logic Pro
-mas install 424389933 # Final Cut Pro
+  # Media Editing
+  [634148309]="Logic Pro"
+  [424389933]="Final Cut Pro"
 
-# Development Tools
-mas install 640199958 # Developer
-mas install 899247664 # TestFlight
-mas install 497799835 # Xcode
+  # Development Tools
+  [640199958]="Developer"
+  [899247664]="TestFlight"
+  [497799835]="Xcode"
+)
+
+failed_apps=()
+
+for app_id in "${!apps[@]}"; do
+  app_name="${apps[$app_id]}"
+  echo "Processing: ${app_name} (${app_id})..."
+
+  # Check if app is already installed
+  if mas list | grep -q "^${app_id}"; then
+    echo "  ✓ Already installed, skipping"
+    continue
+  fi
+
+  # Try to install; use 'get' first for free apps not yet "purchased"
+  if ! mas install "${app_id}" 2>/dev/null; then
+    echo "  → Not yet in library, attempting to get (free apps only)..."
+    if ! mas get "${app_id}" 2>/dev/null; then
+      echo "  ✗ Failed to install ${app_name}"
+      echo "    This app may need to be manually purchased/downloaded from the App Store first"
+      failed_apps+=("${app_name} (${app_id})")
+    fi
+  fi
+done
 
 echo
-echo "Finished installing AppStore applications"
-
+if [ ${#failed_apps[@]} -eq 0 ]; then
+  echo "✓ Finished installing all App Store applications"
+else
+  echo "⚠ Finished with some failures:"
+  printf '  - %s\n' "${failed_apps[@]}"
+  echo
+  echo "Please manually purchase/download these apps in the App Store, then re-run this script."
+  exit 1
+fi
