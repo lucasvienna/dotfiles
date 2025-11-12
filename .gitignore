@@ -19,14 +19,13 @@ tags
 [._]*.un~/
 
 *.spl
-nvim/.config/nvim/autoload/
-nvim/.config/nvim/colors/
+.config/nvim/autoload/
+.config/nvim/colors/
 .config/nvim/lua/plugins/theme.lua
-.config/ghostty/config.local
+.config/git/allowed_signers
 .config/git/config.local
+.config/ghostty/config.local
+.config/zsh/*.local
 .local/bin/local/
-.aliases.local
-.zprofile.local
-.zshrc.local
 .zsh_history*
 install-config
