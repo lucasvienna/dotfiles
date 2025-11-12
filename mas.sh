@@ -14,13 +14,6 @@ if ! command -v "mas" &>/dev/null; then
   exit 1
 fi
 
-# Check if signed into Mac App Store
-if ! mas account &>/dev/null; then
-  echo "Error: You must be signed into the Mac App Store to install apps."
-  echo "Please open the App Store app, sign in, and try again."
-  exit 1
-fi
-
 # -------------------------------
 # macOS App Store
 # -------------------------------
