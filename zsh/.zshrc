@@ -1,5 +1,6 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
+export PATH="$HOME/.local/bin:$PATH:/mnt/c/Program Files/Microsoft VS Code/bin"
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -28,7 +29,7 @@ zstyle ':omz:update' mode auto      # update automatically without asking
 # You can also set it to another string to have that shown instead of the default red dots.
 # e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
 # Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
+COMPLETION_WAITING_DOTS="true"
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
@@ -57,6 +58,7 @@ plugins=(
   zsh-syntax-highlighting
 )
 
+path+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
@@ -78,8 +80,8 @@ export SSH_KEY_PATH="~/.ssh/id_ed25519"
 # enable GPG signing
 export GPG_TTY=$(tty)
 
-# browser in windows
-export BROWSER="/mnt/c/Program Files/Mozilla Firefox/firefox.exe"
+# allow wsl to open browsers
+export BROWSER='/mnt/c/Program Files/Zen Browser/zen.exe'
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
@@ -92,6 +94,3 @@ fi
 # Set the java stuff
 export JAVA_HOME="/usr/lib/jvm/temurin-17-jdk-amd64"
 export PATH="$PATH:$JAVA_HOME/bin"
-
-# make sure node is available as nodejs
-alias nodejs=node

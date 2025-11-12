@@ -13,12 +13,23 @@ alias vimdiff='nvim -d'
 alias pping='prettyping'
 alias gkeys='gpg --list-secret-keys --keyid-format LONG'
 alias tree="tree -a -I '.git'"
+alias claude="/home/lvi/.claude/local/claude"
+alias nodejs='node'
+alias pn='pnpm'
+
 # windows fuckery
 alias open="explorer.exe"
 alias copy="clip.exe"
 
+# terramate/form
+alias tm="terramate"
+alias tf="terraform"
+alias tmg="tm generate"
+alias tfmt="tm fmt && tf fmt -recursive"
+alias tmr="terramate script run"
+
 # ls
-alias ls='ls -GFh'
+alias ls='ls --color=auto -GFh'
 alias l='ls -GFhl'
 alias ll='ls -lah'
 
@@ -31,11 +42,7 @@ mkcd ()
 
 # Directories
 alias wk='cd ~/workspace/'
-alias pdi='/home/lvi/workspace/local-dev/bin/local-dev'
-alias pdia='cd ~/workspace/apps'
-alias pdis='cd ~/workspace/product-data-integration-service'
-alias pdid='cd ~/workspace/local-dev'
-alias pdij='cd ~/workspace/java-parent/'
+alias pdi='cd ~/workspace/pdi/product-data-integration'
 
 # ADB
 alias adbd='adb devices'

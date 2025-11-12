@@ -12,18 +12,23 @@
 	excludesfile = ~/.gitignore_global
 
 [credential]
-	helper = /mnt/c/Program\\ Files/Git/mingw64/bin/git-credential-manager.exe
+	helper = "/mnt/c/Program Files/Git/mingw64/bin/git-credential-manager.exe"
 
 [gpg]
 	format = ssh
 	program = gpg
 
+[gpg "ssh"]
+	allowedSignersFile = /home/lvi/.config/git/allowed_signers
+
 [tag]
 	forceSignAnnotated = true
 	gpgsign = true
+	sort = version:refname
 
 [merge]
 	tool = vimdiff
+	conflictstyle = zdiff3
 [mergetool]
 	prompt = false
 [mergetool "vimdiff"]
@@ -31,11 +36,37 @@
 
 [diff]
 	tool = vimdiff
+	algorithm = histogram
+	colorMoved = plain
+	mnemonicPrefix = true
+	renames = true
 [difftool]
 	prompt = false
 
+[init]
+	defaultBranch = main
+[fetch]
+	prune = true
+	pruneTags = true
+	all = true
+[push]
+	autoSetupRemote = true
+	followTags = true
 [pull]
 	rebase = true
+
+[rebase]
+	autoSquash = true
+	autoStash = true
+	updateRefs = true
+[rerere]
+	autoupdate = true
+	enabled = true
+
+[column]
+	ui = auto
+[branch]
+	sort = -committerdate
 
 [alias]
 	unstage = reset --soft HEAD^
@@ -46,5 +77,9 @@
 	########
 	aliases = !git config -l | grep alias | cut -c 7-
 
-[gpg "ssh"]
-	allowedSignersFile = /home/lvi/.config/git/allowed_signers
+[safe]
+	directory = %(prefix)///wsl.localhost/Ubuntu/home/lvi/workspace/cloud/*
+	directory = %(prefix)///wsl.localhost/Ubuntu/home/lvi/workspace/cloud/crosspoint
+
+[help]
+	autocorrect = prompt
