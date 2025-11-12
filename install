@@ -501,7 +501,6 @@ create_initial_dirs() {
   mkdir -p \
     "${HOME}/.cache/zsh" \
     "${HOME}/.config/btop/themes" \
-    "${HOME}/.config/flutter" \
     "${HOME}/.config/fzf" \
     "${HOME}/.config/gh" \
     "${HOME}/.config/ghostty" \
@@ -1075,22 +1074,25 @@ configure_git() {
   name = ${YOUR_NAME}
   email = ${YOUR_EMAIL}
 
-# Uncomment the options below to auto-sign your git commits / tags using GPG.
-# Learn more about signing git commits here:
-#   https://nickjanetakis.com/blog/signing-and-verifying-git-commits-on-the-command-line-and-github
-
-#[commit]
-#  gpgsign = true
-
-# This option requires git 2.23+ to work and you must annotate your tags,
-# although -m "" works if you want an empty message.
-#[tag]
-#  gpgSign = true
-
 [delta]
   # If you prefer side by side diffs, uncomment this.
   #side-by-side = true
+
+[gpg]
+  format = ssh
 EOF
+
+    if [ "${OS_TYPE}" == "linux" ]; then
+      cat <<EOF >"${git_config_local_path}"
+[gpg "ssh"]
+  program = "/mnt/c/Users/LVI/AppData/Local/Microsoft/WindowsApps/op-ssh-sign-wsl.exe"
+EOF
+    else
+      cat <<EOF >"${git_config_local_path}"
+[gpg "ssh"]
+  program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+EOF
+    fi
   fi
 
   echo "It has been configured in '$(dirname "${git_config_local_path}")'"
