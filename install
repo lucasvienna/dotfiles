@@ -127,10 +127,13 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   BREW_PACKAGES_EXTRAS="${BREW_PACKAGES_EXTRAS:-}"
 
   BREW_CASK_PACKAGES="${BREW_CASK_PACKAGES:-
+    1password
+    alfred
     arc
     discord
     flutter
     ghostty
+    jetbrains-toolbox
     obsidian
     orbstack
     starship
