@@ -26,4 +26,6 @@ return {
       end,
     },
   },
+  { "git@github.com:dracula-pro/vim.git", name = "dracula_pro" },
+  { "ellisonleao/gruvbox.nvim" },
 }
