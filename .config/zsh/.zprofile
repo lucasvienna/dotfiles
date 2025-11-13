@@ -20,6 +20,7 @@ export PATH="${XDG_DATA_HOME}/mise/shims:${PATH}"
 
 # Configure GPG.
 export GNUPGHOME="${XDG_CONFIG_HOME}/gnupg"
+export GPG_TTY=$(tty)
 
 # Add colors to the less and man commands.
 export LESS=-R
