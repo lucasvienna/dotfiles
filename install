@@ -357,7 +357,18 @@ _display_packages() {
 }
 
 _stowit() {
-  stow -v -R "$@"
+  local package="${*: -1}"
+  local stow_flags="--restow --ignore='(theme\.(sh|theme|ron|conf|lua)|theme|claude)'"
+
+  if [ -n "${DEBUG}" ]; then
+    stow_flags+=" --verbose"
+    stow ${stow_flags} "$@" 2>&1 | grep -v "BUG in find_stowed_path" || true
+  else
+    stow ${stow_flags} "$@" 2>&1 | grep -v "BUG in find_stowed_path" >/dev/null || true
+  fi
+
+  echo "✓ Symlinked ${package}"
+  [ -n "${DEBUG}" ] && echo
 }
 
 # -----------------------------------------------------------------------------
@@ -589,7 +600,7 @@ update_dotfiles() {
   git -C "${DOTFILES_PATH}" fetch origin
 
   local new_commit_count=
-  new_commit_count="$(git -C "${DOTFILES_PATH}" rev-list ..origin --count)"
+  new_commit_count="$(git -C "${DOTFILES_PATH}" rev-list HEAD..@{u} --count 2>/dev/null || echo "0")"
 
   if [ "${new_commit_count}" = "0" ]; then
     echo "Skipping, since your local dotfiles already have the latest updates"
@@ -773,6 +784,8 @@ EOF
     [ -n "$YYES" ] && yn=y
     case "${yn}" in
     [Yy]*)
+      echo # newline for aesthetics
+
       # Avoid using ln -T flag since it doesn't exist on macOS. We're being
       # extra careful here to only delete symlinks if they exist. Technically
       # rm -f would work but that could delete real files potentially.
