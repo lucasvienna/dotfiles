@@ -9,9 +9,12 @@ return {
     "folke/tokyonight.nvim",
     opts = {
       style = "moon",
+      transparent = true,
       styles = {
         comments = { italic = true },
         keywords = { italic = false },
+        sidebars = "transparent",
+        floats = "transparent",
       },
       on_highlights = function(hl, c)
         hl.SnacksPickerPathHidden = { fg = c.comment }

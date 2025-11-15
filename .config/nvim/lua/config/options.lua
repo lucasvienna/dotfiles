@@ -7,7 +7,7 @@
 -- example editing a Lua file in my dotfiles prevented me from fuzzy finding
 -- files of the nvim/ directory. Remove this to bring things back to LazyVim's
 -- default behavior.
-vim.g.root_spec = { "cwd" }
+-- vim.g.root_spec = { "cwd" }
 
 -- The ~/.local/state/nvim/lsp.log can get pretty noisy. Mine was ~28MB after 2
 -- weeks with the default setting. My thought process here is it can remain OFF
