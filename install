@@ -359,16 +359,27 @@ _display_packages() {
 _stowit() {
   local package="${*: -1}"
   local stow_flags="--restow --ignore='(theme\.(sh|theme|ron|conf|lua)|theme|claude)'"
+  local stow_output
+  local stow_exit=0
 
   if [ -n "${DEBUG}" ]; then
     stow_flags+=" --verbose"
-    stow ${stow_flags} "$@" 2>&1 | grep -v "BUG in find_stowed_path" || true
+    stow_output=$(stow ${stow_flags} "$@" 2>&1) || stow_exit=$?
+    echo "$stow_output" | grep -v "BUG in find_stowed_path" || true
   else
-    stow ${stow_flags} "$@" 2>&1 | grep -v "BUG in find_stowed_path" >/dev/null || true
+    stow_output=$(stow ${stow_flags} "$@" 2>&1) || stow_exit=$?
+  fi
+
+  if [ $stow_exit -ne 0 ]; then
+    echo "✗ Failed to symlink ${package}" >&2
+    return $stow_exit
   fi
 
   echo "✓ Symlinked ${package}"
+  
   [ -n "${DEBUG}" ] && echo
+  
+  return 0
 }
 
 # -----------------------------------------------------------------------------
@@ -528,6 +539,7 @@ create_initial_dirs() {
     "${HOME}/.config/git" \
     "${HOME}/.config/gitui" \
     "${HOME}/.config/nvim" \
+    "${HOME}/.config/starship" \
     "${HOME}/.config/tmux/plugins" \
     "${HOME}/.config/zsh" \
     "${HOME}/.local/bin" \
