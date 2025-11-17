@@ -83,6 +83,7 @@ export SYMLINKS=(
   "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/ghostty\" ghostty"
   "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/git\" git"
   "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/nvim\" nvim"
+  "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/starship\" starship"
   "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/tmux\" tmux"
   "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/zsh\" --ignore=\"^\.zshenv$\" zsh"
   "ln -fns \"\${DOTFILES_PATH}/.config/zsh/.zshenv\" \"\${HOME}/.zshenv\""
