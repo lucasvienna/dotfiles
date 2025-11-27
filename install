@@ -886,9 +886,10 @@ configure_shell() {
       printf "\neval \"\$(%s/bin/brew shellenv)\"\n" "${prefix}" >>"${zprofile_path}"
     fi
 
-    if ! grep -q '^alias grep="grep -G"' "${aliases_path}" 2>/dev/null; then
+    if ! grep -q '^alias ls="ls -G"' "${aliases_path}" 2>/dev/null; then
       cat <<EOF >>"${aliases_path}"
 
+alias ls="ls -G"
 alias grep="grep -G"
 alias fgrep="fgrep -G"
 alias egrep="egrep -G"
