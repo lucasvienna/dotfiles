@@ -36,9 +36,9 @@ alias tmg="tm generate"
 alias tfmt="tm fmt; tofu fmt -recursive"
 
 # ls
-alias ls='ls -GFh'
-alias l='ls -GFhl'
-alias ll='ls -Gahl'
+alias ll='ls -ahl'
+alias la='ls -AF'
+alias l='ls -CF'
 
 # permissions
 alias 755d="find . -type d -exec chmod 755 {} \;"
@@ -83,6 +83,7 @@ alias dlog="docker log -f"
 
 ##### git
 alias gac='gaa && gcm'
+alias gi="git init && git symbolic-ref HEAD refs/heads/main"
 alias gii="gi && gac 'Initial commit'"
 alias grao='git remote add origin'
 alias gpoa='git push -u origin --all'
