@@ -376,9 +376,9 @@ _stowit() {
   fi
 
   echo "✓ Symlinked ${package}"
-  
+
   [ -n "${DEBUG}" ] && echo
-  
+
   return 0
 }
 
@@ -875,6 +875,10 @@ configure_shell() {
       printf '\nexport HOMEBREW_NO_ANALYTICS=1\n' >>"${zprofile_path}"
     fi
 
+    if ! grep -q "alias.*rm" "${zprofile_path}" 2>/dev/null; then
+      printf "\n# safety net\nalias rm='rm -I'\n" >>"${zprofile_path}"
+    fi
+
     if ! grep -q "eval.*brew.*shellenv" "${zprofile_path}" 2>/dev/null; then
       local prefix="/opt/homebrew"
       [[ "${CPU_ARCH}" == "x86_64" ]] && prefix="/usr/local"
@@ -934,6 +938,10 @@ alias open="/mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe"
 alias wopen="cmd.exe /C start 2> /dev/null"
 EOF
       fi
+    fi
+
+    if ! grep -q "alias.*rm" "${zprofile_path}" 2>/dev/null; then
+      printf "\n# safety net\nalias rm='rm -I --preserve-root'\n" >>"${zprofile_path}"
     fi
 
     if ! grep -q 'alias ls="ls --color=auto"' "${aliases_path}" 2>/dev/null; then

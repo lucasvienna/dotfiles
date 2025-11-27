@@ -20,8 +20,6 @@ alias ping='ping -c 5'
 alias pping='prettyping -c 5'
 alias gkeys='gpg --list-secret-keys --keyid-format LONG'
 alias tree="tree -a -I '.git'"
-# safety net
-alias rm='rm -I --preserve-root'
 
 # System
 alias path='echo -e ${PATH//:/\\n}'
@@ -45,13 +43,6 @@ alias ll='ls -Gahl'
 # permissions
 alias 755d="find . -type d -exec chmod 755 {} \;"
 alias 644f="find . -type f -exec chmod 644 {} \;"
-
-# Directories
-alias wk='cd ~/Workspace/'
-alias gth='cd ~/Workspace/github.com'
-alias nr='cd ~/Workspace/NeonRook'
-alias emp='cd ~/Workspace/NeonRook/empire'
-alias rlm='cd ~/Workspace/NeonRook/realm'
 
 # Recursively delete `.DS_Store` files
 alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"

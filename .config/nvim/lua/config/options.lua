@@ -16,7 +16,7 @@ vim.lsp.set_log_level("WARN")
 local opt = vim.opt
 
 -- Show a vertical line at this character.
-opt.colorcolumn = "80"
+opt.colorcolumn = "100"
 
 -- Each buffer gets its own status line instead of sharing one.
 opt.laststatus = 2
