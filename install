@@ -1186,6 +1186,9 @@ install_tmux_plugins() {
   rm -rf "${tpm_path}"
   git clone --depth 1 https://github.com/tmux-plugins/tpm "${tpm_path}"
 
+  mkdir -p "$TMUX_PLUGIN_MANAGER_PATH/catppuccin"
+  git clone https://github.com/catppuccin/tmux.git "$TMUX_PLUGIN_MANAGER_PATH/catppuccin/tmux"
+
   "${tpm_path}/bin/install_plugins"
 }
 
