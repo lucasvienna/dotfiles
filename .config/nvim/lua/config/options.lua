@@ -7,7 +7,7 @@
 -- example editing a Lua file in my dotfiles prevented me from fuzzy finding
 -- files of the nvim/ directory. Remove this to bring things back to LazyVim's
 -- default behavior.
-vim.g.root_spec = { "cwd" }
+-- vim.g.root_spec = { "cwd" }
 
 -- For ease of debugging, setting the default to WARN is a nice middleground
 -- It's not super noisy, but quick glances at the file are still useful.
