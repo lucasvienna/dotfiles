@@ -13,6 +13,15 @@ return {
 			vim.g.dracula_undercurl = 1
 			vim.g.dracula_strikethrough = 1
 			vim.g.dracula_full_special_attrs_support = 1
+
+			-- Override highlights after colorscheme loads
+			vim.api.nvim_create_autocmd("ColorScheme", {
+				pattern = "dracula_pro*",
+				callback = function()
+					-- More visible active button in Lazy UI
+					vim.api.nvim_set_hl(0, "LazyButtonActive", { bg = "#7c6f9f", fg = "#f8f8f2", bold = true })
+				end,
+			})
 		end,
 	},
 	{
