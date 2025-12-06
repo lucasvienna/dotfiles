@@ -3,6 +3,7 @@ font-family = CaskaydiaCove Nerd Font Mono
 font-size = 14
 font-feature = -calt, -liga, -dlig
 
+adjust-cursor-thickness = 3
 cursor-style-blink = false
 cursor-text = #000000
 
