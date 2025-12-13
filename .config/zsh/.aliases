@@ -4,6 +4,7 @@
 alias zconf='nvim $ZDOTDIR/.zshrc'
 alias tconf='nvim $HOME/.config/tmux/.tmux.conf'
 alias aliases='nvim $HOME/.config/zsh/.aliases && . $HOME/.config/zsh/.aliases'
+alias laliases='nvim $HOME/.config/zsh/.aliases.local && . $HOME/.config/zsh/.aliases.local'
 alias ohmyzsh='nvim ~/.oh-my-zsh'
 alias sz='. ${ZDOTDIR}/.zprofile && . ${ZDOTDIR}/.zshrc'
 alias dt='cd ${DOTFILES_PATH} && nvim .'
