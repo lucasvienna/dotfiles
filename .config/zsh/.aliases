@@ -38,7 +38,7 @@ alias tmg="tm generate"
 alias tfmt="tm fmt; tofu fmt -recursive"
 
 # ls
-alias ll='ls -ahl'
+alias ll='ls -ahlF'
 alias la='ls -AF'
 alias l='ls -CF'
 
