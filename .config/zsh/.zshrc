@@ -25,31 +25,22 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
-  plugins=(
-    git
-    rust
-    kubectl
-    helm
-    vscode
-    sublime
-    sublime-merge
-    fzf-tab
-    zsh-autosuggestions
-    fast-syntax-highlighting
-    starship
-  )
-else
-  plugins=(
-    git
-    rust
-    kubectl
-    helm
-    vscode
-    sublime
-    sublime-merge
-  )
-fi
+plugins=(
+  brew
+  git
+  rust
+  kubectl
+  helm
+  k9s
+  terraform
+  opentofu
+  vscode
+  sublime-merge
+  fzf-tab
+  zsh-autosuggestions
+  fast-syntax-highlighting
+  starship
+)
 
 source $ZSH/oh-my-zsh.sh
 
