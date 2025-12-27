@@ -3,6 +3,7 @@
 # ZSH config
 alias zconf='nvim $ZDOTDIR/.zshrc'
 alias tconf='nvim $HOME/.config/tmux/.tmux.conf'
+alias gconf="ghostty +edit-config"
 alias aliases='nvim $HOME/.config/zsh/.aliases && . $HOME/.config/zsh/.aliases'
 alias laliases='nvim $HOME/.config/zsh/.aliases.local && . $HOME/.config/zsh/.aliases.local'
 alias ohmyzsh='nvim ~/.oh-my-zsh'
