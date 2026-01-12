@@ -13,6 +13,10 @@ window-padding-balance = true
 
 keybind = shift+enter=text:\x1b\r
 
+# Make Option key send Alt codes instead of special characters.
+# Options: false, true, left, right
+macos-option-as-alt = left
+
 # Load theme.
 config-file = ?theme
 
