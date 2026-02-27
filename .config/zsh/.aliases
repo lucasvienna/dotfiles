@@ -42,6 +42,7 @@ alias tfmt="tm fmt; tofu fmt -recursive"
 alias ll='ls -ahlF'
 alias la='ls -AF'
 alias l='ls -CF'
+alias pwc='pwd | clip-copy'
 
 # permissions
 alias 755d="find . -type d -exec chmod 755 {} \;"
