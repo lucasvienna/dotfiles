@@ -36,12 +36,24 @@ return {
 
       opts.formatters_by_ft = opts.formatters_by_ft or {}
       local oxfmt_fts = {
+        "css",
+        "graphql",
+        "handlebars",
+        "html",
+        "htmlangular",
         "javascript",
         "javascriptreact",
+        "json",
+        "json5",
+        "jsonc",
+        "less",
+        "markdown",
+        "mdx",
+        "scss",
+        "toml",
         "typescript",
         "typescriptreact",
-        "json",
-        "jsonc",
+        "vue",
         "yaml",
       }
       for _, ft in ipairs(oxfmt_fts) do
