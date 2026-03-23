@@ -2,5 +2,8 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 [aws]
-format='on [$symbol($profile )(\($region\) )(\[$duration\] )]($style)'
-symbol='☁️ '
+format = 'on [$symbol($profile )(\($region\) )(\[$duration\] )]($style)'
+symbol = '☁️ '
+
+[memory_usage]
+disabled = false
