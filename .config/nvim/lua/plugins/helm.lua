@@ -33,7 +33,14 @@ return {
     optional = true,
     opts = {
       formatters_by_ft = {
-        helm = { "prettier" },
+        helm = { "helmfmt" },
+      },
+      formatters = {
+        helmfmt = {
+          command = "helmfmt",
+          args = { "--files", "$FILENAME" },
+          stdin = false,
+        },
       },
     },
   },
