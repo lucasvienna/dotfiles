@@ -5,5 +5,8 @@
 format = 'on [$symbol($profile )(\($region\) )(\[$duration\] )]($style)'
 symbol = '☁️ '
 
+[dotnet]
+detect_files = ["global.json", "Directory.Build.props", "Directory.Build.targets", "Packages.props"]
+
 [memory_usage]
 disabled = false

@@ -4,7 +4,14 @@
 set -o errexit
 
 BOOTSTRAP_PATH="/tmp/vienna-dotfiles"
-DOTFILES_PATH="${DOTFILES_PATH:-}"
+if [ -z "${DOTFILES_PATH:-}" ]; then
+  _script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  # Only auto-detect if the script is running from a real dotfiles repo, not from the bootstrap temp directory.
+  if [ "${_script_dir}" != "${BOOTSTRAP_PATH}" ]; then
+    DOTFILES_PATH="${_script_dir}"
+  fi
+  unset _script_dir
+fi
 
 XDG_CONFIG_HOME="${HOME}/.config"
 
@@ -732,6 +739,7 @@ install_omz() {
     curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -o "${install_tmp}"
 
     ZDOTDIR="${ZDOTDIR:-${XDG_CONFIG_HOME}/zsh}"
+    chmod +x $install_tmp
     sh -c "${install_tmp}" "" --unattended --keep-zshrc
   fi
 }
