@@ -46,8 +46,9 @@ export LANG=en_US.UTF-8
 export EDITOR="nvim"
 export DIFFPROG="nvim -d"
 
-# tell homebrew to shut up
+# Homebrew customisation
 export HOMEBREW_NO_ENV_HINTS=1
+export HOMEBREW_NO_ANALYTICS=1
 
 # rust
 export PATH="$HOME/.cargo/bin:$PATH"
