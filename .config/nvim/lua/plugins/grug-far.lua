@@ -2,7 +2,7 @@ local MAP = vim.keymap.set
 
 return {
   "MagicDuck/grug-far.nvim",
-  cm = { "GrugFar", "GrugFarWithin" },
+  cmd = { "GrugFar", "GrugFarWithin" },
   config = function()
     vim.api.nvim_create_autocmd("FileType", {
       pattern = { "grug-far" },
