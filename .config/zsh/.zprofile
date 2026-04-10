@@ -44,6 +44,7 @@ export LANG=en_US.UTF-8
 
 # Default programs to run.
 export EDITOR="nvim"
+export VISUAL="zed"
 export DIFFPROG="nvim -d"
 
 # Homebrew customisation
