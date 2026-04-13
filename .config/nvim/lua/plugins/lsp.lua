@@ -6,6 +6,11 @@ return {
         yamlls = {
           settings = {
             yaml = {
+              schemas = {
+                ["https://spec.openapis.org/oas/3.1/schema/2025-11-23"] = {
+                  "libs/api/lib/*.yaml",
+                },
+              },
               customTags = {
                 -- These are all related to AWS CloudFormation.
                 "!And sequence",
