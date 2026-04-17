@@ -34,7 +34,6 @@ plugins=(
   k9s
   terraform
   opentofu
-  vscode
   sublime-merge
   fzf-tab
   zsh-autosuggestions
