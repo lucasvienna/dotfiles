@@ -7,6 +7,19 @@
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
 
+-- Don't dim dotfiles in the explorer / picker — treat them like regular files.
+-- Uses vim.schedule so this runs after snacks re-applies its managed highlights.
+local function undim_hidden()
+  vim.api.nvim_set_hl(0, "SnacksPickerPathHidden", {})
+end
+undim_hidden()
+vim.api.nvim_create_autocmd("ColorScheme", {
+  group = vim.api.nvim_create_augroup("dotfiles_snacks_hl", { clear = true }),
+  callback = function()
+    vim.schedule(undim_hidden)
+  end,
+})
+
 vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
   pattern = { "*.yaml", "*.yml", "*.tpl" },
   callback = function()

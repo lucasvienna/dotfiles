@@ -23,6 +23,7 @@ alias pping='prettyping -c 5'
 alias gkeys='gpg --list-secret-keys --keyid-format LONG'
 alias tree="tree -a -I '.git'"
 alias c="cargo"
+alias bb="bun --bun"
 
 # System
 alias path='echo -e ${PATH//:/\\n}'

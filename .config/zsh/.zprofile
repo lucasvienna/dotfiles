@@ -51,6 +51,9 @@ export DIFFPROG="nvim -d"
 export HOMEBREW_NO_ENV_HINTS=1
 export HOMEBREW_NO_ANALYTICS=1
 
+# tell some programs not to track
+export DO_NOT_TRACK=1
+
 # rust
 export PATH="$HOME/.cargo/bin:$PATH"
 
