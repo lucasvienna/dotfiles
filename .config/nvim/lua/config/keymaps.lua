@@ -7,6 +7,7 @@ local MAP = vim.keymap.set
 MAP("n", "<leader>uW", ":set list!<CR>", { desc = "Toggle WhiteSpace" })
 
 MAP("n", "<leader>bc", ":let @+ = expand('%:.')<CR>", { desc = "Copy Path" })
+MAP("n", "<leader>gm", ":!smerge .<CR>", { desc = "Open SublimeMerge (cwd)" })
 
 MAP("n", "<leader>L", "<cmd>LazyExtras<cr>", { desc = "Lazy Extras" })
 
