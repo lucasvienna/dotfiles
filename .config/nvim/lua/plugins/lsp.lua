@@ -12,6 +12,8 @@ return {
                 },
               },
               customTags = {
+                -- GitLab CI
+                "!reference sequence",
                 -- These are all related to AWS CloudFormation.
                 "!And sequence",
                 "!Base64",
