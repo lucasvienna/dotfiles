@@ -16,14 +16,16 @@ alias lp='cd ${HOME}/.local/share/nvim/lazy && nvim .'
 alias reload="omz reload"
 
 # Tooling
+alias v="nvim"
+alias c="cargo"
+alias m="mise"
 alias pn="pnpm"
+alias bb="bun --bun"
 alias vimdiff='nvim -d'
 alias ping='ping -c 5'
 alias pping='prettyping -c 5'
 alias gkeys='gpg --list-secret-keys --keyid-format LONG'
 alias tree="tree -a -I '.git'"
-alias c="cargo"
-alias bb="bun --bun"
 
 # System
 alias path='echo -e ${PATH//:/\\n}'
@@ -78,7 +80,8 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 
 # Networking
 alias myip="curl https://ifconfig.me; echo | tee clip-copy"
-alias ports="sudo lsof -i -P -n | grep LISTEN"
+alias ports="lsof -i -P -n | grep LISTEN"
+alias k8080="lsof -ti tcp:8080 | xargs -r kill"
 
 # Docker
 alias dockerips="docker ps -q | xargs -n 1 docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}} {{ .Name }}' | sed 's/ \// /'"
