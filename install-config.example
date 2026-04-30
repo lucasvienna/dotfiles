@@ -1,98 +1,67 @@
 #!/usr/bin/env bash
+# shellcheck shell=bash
+# User overrides for ./install. Copy to install-config (gitignored) and edit.
+#
+# The defaults you'd be overriding live in:
+#   - _install/packages/{debian,darwin}   # APT/Brew/Mise package lists
+#   - _install/mise_languages              # Mise programming languages
+#   - _install/symlinks                    # GNU Stow / ln symlink rules
+#   - _install/env                         # Shared helpers + URLs
+#
+# Each base var (e.g. APT_PACKAGES) replaces the default; each *_EXTRAS var
+# appends to it. Empty means "use default". Set a single quoted space (e.g.
+# APT_PACKAGES=" ") to skip a category entirely.
 
 set -o errexit
 
-# You can find the default values in the install script near the top of the
-# file. Any value here which is empty will be ignored and the default value
-# will be used. The non-example version of this file is git ignored.
-#
-# The goal of this config is to help you customize the defaults for a few
-# common things without needing to fork the repo.
-#
-# I also use some of these to further customize my system with packages that
-# I didn't push up to my dotfiles.
-
-# Provide a different repo to use. If you're using GitHub you only need to
-# update the DOTFILES_REPO_SLUG, ie. yourname/dotfiles instead of lucasvienna/dotfiles.
-#
-# This could be useful if you've forked the project into your own repo.
+# -----------------------------------------------------------------------------
+# Repo / branch overrides
+# -----------------------------------------------------------------------------
+# Useful if you've forked the repo. DOTFILES_REPO_SLUG is enough for GitHub.
 export DOTFILES_REPO_SLUG=
 export DOTFILES_CLONE_URL=
 export DOTFILES_UPSTREAM_URL=
 
-# If you define these, they will get used instead of prompting you. Keep in
-# mind you won't be prompted once you've answered them once since the values
-# get persisted and read independent of these values. Still, this could be
-# handy to set for fresh systems to avoid ever needing to input them manually.
+# -----------------------------------------------------------------------------
+# Identity (avoids interactive prompts on fresh systems)
+# -----------------------------------------------------------------------------
 export YOUR_NAME=
 export YOUR_EMAIL=
 
-# Override which packages get installed. If you define anything in the extras
-# variable they will get appended to the non-extra packages. This lets you use
-# the default packages but add any extra packages you want.
-#
-# If you don't want to install any default packages then you can use a single
-# quoted space as the value, for example: export APT_PACKAGES=" "
+# -----------------------------------------------------------------------------
+# Packages
+# -----------------------------------------------------------------------------
 export APT_PACKAGES=
 export APT_PACKAGES_EXTRAS=
 
-# Override which packages get installed. If you define anything in the extras
-# variable they will get appended to the non-extra packages. This lets you use
-# the default packages but add any extra packages you want.
-#
-# If you don't want to install any default packages then you can use a single
-# quoted space as the value, for example: export BREW_CASK_PACKAGES=" "
 export BREW_PACKAGES=
 export BREW_PACKAGES_EXTRAS=
 export BREW_CASK_PACKAGES=
 export BREW_CASK_PACKAGES_EXTRAS=
 
-# Install Mise packages for specific platforms. For example, maybe you want
-# the latest and greatest versions on Debian for a few tools but macOS
-# already has them so you don't need Mise packages there.
-#
-# If you don't want to install any default packages then you can use a single
-# quoted space as the value, for example: export MISE_PACKAGES_DEBIAN=" "
 export MISE_PACKAGES_DEBIAN=
 export MISE_PACKAGES_DEBIAN_EXTRAS=
 
 export MISE_PACKAGES_MACOS=
 export MISE_PACKAGES_MACOS_EXTRAS=
 
-# Install programming languages.
-#
-# If you don't want to install any default languages then you can use a single
-# quoted space as the value, for example: export MISE_LANGUAGES=" "
+# -----------------------------------------------------------------------------
+# Programming languages (Mise)
+# -----------------------------------------------------------------------------
+# Keys are the binary name; values are passed to `mise use --global`.
 declare -A MISE_LANGUAGES=
 declare -A MISE_LANGUAGES_EXTRAS=
 
-# Here's an example to demonstrate the syntax. The key is the binary name and
-# the value is what you would pass into Mise to install it.
+# Example:
 # MISE_LANGUAGES_EXTRAS["ruby"]="ruby@3.4"
 
 export MISE_LANGUAGES
 export MISE_LANGUAGES_EXTRAS
 
-# Symlinks that will get created in all operating systems. This lets you add
-# your own custom tools and set up whatever configuration you may need. Chances
-# are you'll want to customize the SYMLINKS_EXTRAS variable to add new things.
-export SYMLINKS=(
-  "_stowit -d \"\${DOTFILES_PATH}/.local\" -t \"\${HOME}/.local/bin\" bin"
-  "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/btop\" btop"
-  "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/fzf\" fzf"
-  "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/ghostty\" ghostty"
-  "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/git\" git"
-  "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/nvim\" nvim"
-  "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/starship\" starship"
-  "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/tmux\" tmux"
-  "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/zsh\" --ignore=\"^\.zshenv$\" zsh"
-  "ln -fns \"\${DOTFILES_PATH}/.config/zsh/.zshenv\" \"\${HOME}/.zshenv\""
-)
+# -----------------------------------------------------------------------------
+# Symlinks
+# -----------------------------------------------------------------------------
+# SYMLINKS / SYMLINKS_WSL replace the full default lists; the *_EXTRAS variants
+# append. In nearly all cases you want SYMLINKS_EXTRAS, not SYMLINKS.
 export SYMLINKS_EXTRAS=
-
-# Symlinks that will get created only in WSL.
-export SYMLINKS_WSL=(
-  "cp \"\${DOTFILES_PATH}/wsl/.wslconfig\" \"/mnt/c/Users/%WindowsUser/.wslconfig\" || true"
-  "sudo ln -fns \"\${DOTFILES_PATH}/etc/wsl.conf\" \"/etc/wsl.conf\""
-)
 export SYMLINKS_WSL_EXTRAS=

@@ -1,0 +1,65 @@
+# shellcheck shell=bash
+# Default Debian / Ubuntu / WSL packages.
+#
+# Override or extend any of these in install-config (use *_EXTRAS to append,
+# or set the base var to overwrite). To skip an entire group, set it to a
+# single quoted space, e.g. APT_PACKAGES=" ".
+
+APT_PACKAGES="${APT_PACKAGES:-
+  apt-transport-https
+  aspell
+  bc
+  dnsutils
+  build-essential
+  coreutils
+  curl
+  findutils
+  fontconfig
+  git
+  gnupg
+  inotify-tools
+  iproute2
+  netcat-openbsd
+  openssh-server
+  pinentry-curses
+  procps
+  pwgen
+  rsync
+  silversearcher-ag
+  stow
+  tmux
+  unzip
+  wget
+  whois
+  xclip
+  xz-utils
+  zip
+  zsh
+}
+"
+APT_PACKAGES_EXTRAS="${APT_PACKAGES_EXTRAS:-}"
+
+# Modern CLI tools delivered via Mise on Debian-likes. APT versions tend to
+# lag, so we prefer Mise here. macOS gets these from Homebrew instead.
+MISE_PACKAGES_DEBIAN="${MISE_PACKAGES_DEBIAN:-
+  1password
+  aws-cli
+  btop
+  fd
+  fzf
+  jq
+  helm
+  kubectl
+  k9s
+  lazygit
+  neovim
+  ripgrep
+  shellcheck
+  shfmt
+  starship
+  terraform
+  terramate
+  yq
+}
+"
+MISE_PACKAGES_DEBIAN_EXTRAS="${MISE_PACKAGES_DEBIAN_EXTRAS:-}"

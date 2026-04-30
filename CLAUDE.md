@@ -91,21 +91,35 @@ apt-get update && apt-get install -y curl && bash <(curl -sS https://raw.githubu
 
 ### Installation System
 
-The `install` script is a comprehensive Bash orchestrator that runs in phases:
+The installer is split between two top-level entry points and a shared
+`_install/` library:
 
-1. **Bootstrap**: Downloads repo to `/tmp/vienna-dotfiles` for review before
-   changes
-2. **Environment Detection**: Identifies OS (macOS/Linux), distro, WSL status,
-   CPU architecture
-3. **Package Installation**: APT (Debian/Ubuntu) or Homebrew (macOS)
-4. **Repository Setup**: Clones to user-specified location (default:
-   `~/dotfiles`)
-5. **Symlink Creation**: Uses GNU Stow to link configs from `.config/` and
-   `.local/bin/`
-6. **Configuration**: Shell (zsh), Git, SSH/GPG keys, programming languages (via
-   Mise)
-7. **Plugin Installation**: Oh-My-Zsh, tmux plugins (TPM), Neovim plugins (Lazy)
-8. **Theme Application**: Sets initial theme
+- **`bootstrap`**: First-run script. Detects environment, installs critical
+  packages (Homebrew + Bash on macOS, sudo + git on Debian), clones the repo
+  to a chosen path, then `exec`s `./install`. Curl-pipe-friendly.
+- **`install`**: Orchestrator. Sources `_install/env` for helpers and
+  `_install/{packages,mise_languages,symlinks}` for data, runs install phases.
+  Re-entrant — safe to re-run after first install.
+- **`_install/env`**: Shared library — color codes, `_info`/`_error`/`_skipping`
+  helpers, `_run_as_root`/`_package_install`, `detect_env`, `warn_root`,
+  `_dotfiles_env` (used by `--debug`).
+
+**Install phases** (`./install`):
+
+1. **Source**: `_install/env`, `install-config`, `_install/packages/${OS}`,
+   `_install/mise_languages`, `_install/symlinks`
+2. **`detect_env`** + **`warn_root`** + **`update_dotfiles`** (only with --pull/--update)
+3. **`check_prereqs`** + **`create_initial_dirs`**
+4. **`install_packages`**: APT + Mise (Debian) or Homebrew + casks (macOS)
+5. **`clone_dotfiles`**: only if DOTFILES_PATH doesn't already exist
+6. **`install_fonts`** (CascadiaCode Nerd Font)
+7. **`install_omz`** + **`install_omz_plugins`**
+8. **`create_symlinks`**: GNU Stow via `_stowit` wrapper
+9. **`configure_{system,home,shell,git}`**: shell aliases, git config.local
+10. **`ask_for_{name,email}`** + **`create_{ssh,gpg}_key`**: identity setup
+11. **`install_programming_languages`**: Mise languages
+12. **`install_{tmux,nvim}_plugins`**: TPM + Lazy
+13. **`set_theme`** + **`healthcheck`** + **`completed_message`**
 
 **Key Design Principles**:
 
@@ -113,7 +127,10 @@ The `install` script is a comprehensive Bash orchestrator that runs in phases:
 - **Non-destructive**: Prompts before overwriting existing configs
 - **Cross-platform**: Handles macOS, Debian, Ubuntu, WSL 2
 - **Customizable**: `install-config` (git-ignored) allows overriding defaults
-  without forking
+  without forking. Defaults live in `_install/packages/`, `_install/mise_languages`,
+  and `_install/symlinks`.
+- **Modular**: Data (package lists, languages, symlinks) is separate from
+  logic. `_install/env` can be sourced by any script that needs the helpers.
 
 ### Configuration Structure
 
@@ -308,15 +325,22 @@ Located in `.config/git/`:
 | `clip-copy` / `clip-paste` | Cross-platform clipboard (Wayland/macOS/X11) |
 | `mkscript`                 | Create executable script with proper shebang |
 | `dtags`                    | Directory tag management                     |
+| `gl` / `gd` / `gbd`        | fzf-driven git log / diff browsers + bulk branch delete |
+| `rcurl`                    | Resilient curl wrapper (retries, timeouts)   |
+| `myip` / `ppjson` / `specs` / `outdated` | Cross-platform utilities       |
 
 All use strict Bash mode: `set -o errexit -o pipefail -o nounset`
 
 ### Important Files
 
-- `install` - Main installation script
+- `bootstrap` - First-run entry point (detects env, installs deps, clones repo, runs install)
+- `install` - Orchestrator (sources `_install/` and `install-config`, runs install phases)
 - `install-config.example` - Customization template
 - `install-config` - User overrides (git-ignored, created on first run)
-- `bootstrap.sh` - macOS App Store bootstrapping
+- `_install/env` - Shared library: helpers, color codes, `detect_env`, `warn_root`
+- `_install/packages/{debian,darwin}` - Default package lists per OS
+- `_install/mise_languages` - Default Mise language definitions
+- `_install/symlinks` - Default `_stowit` symlink list
 - `mas.sh` - macOS App Store app installation
 
 ## Customization

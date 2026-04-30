@@ -1,0 +1,19 @@
+# shellcheck shell=bash
+# Default programming languages installed via Mise.
+#
+# Keys are the binary name; values are passed verbatim to `mise use --global`.
+# Override or extend in install-config. To skip everything, set a stub:
+#   declare -gA MISE_LANGUAGES=( ["_skip"]=" " )
+
+if [[ -z "${MISE_LANGUAGES[*]:-}" ]]; then
+  declare -gA MISE_LANGUAGES
+  MISE_LANGUAGES["node"]="node@lts-krypton"
+  MISE_LANGUAGES["bun"]="bun@latest"
+  MISE_LANGUAGES["python"]="python@3.14"
+  MISE_LANGUAGES["go"]="go@latest"
+  MISE_LANGUAGES["rust"]="rust@stable"
+fi
+
+if [[ -z "${MISE_LANGUAGES_EXTRAS[*]:-}" ]]; then
+  declare -gA MISE_LANGUAGES_EXTRAS
+fi

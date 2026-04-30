@@ -1,0 +1,81 @@
+# shellcheck shell=bash
+# Default macOS packages (Homebrew formulae + casks).
+#
+# Override or extend any of these in install-config (use *_EXTRAS to append,
+# or set the base var to overwrite). To skip an entire group, set it to a
+# single quoted space, e.g. BREW_CASK_PACKAGES=" ".
+
+BREW_PACKAGES="${BREW_PACKAGES:-
+  aspell
+  awscli
+  bash
+  bat
+  bc
+  btop
+  coreutils
+  curl
+  diffutils
+  fastfetch
+  fd
+  findutils
+  fzf
+  gh
+  git
+  git-delta
+  gnupg
+  helm
+  jq
+  kubernetes-cli
+  derailed/k9s/k9s
+  lazygit
+  luajit
+  mas
+  mise
+  nvim
+  opentofu
+  pinentry-mac
+  pwgen
+  ripgrep
+  rsync
+  rustup
+  shellcheck
+  shfmt
+  stow
+  hashicorp/tap/terraform
+  starship
+  terramate
+  the_silver_searcher
+  tmux
+  tree
+  tree-sitter
+  tree-sitter-cli
+  trivy
+  wget
+  xz
+  yq
+}
+"
+BREW_PACKAGES_EXTRAS="${BREW_PACKAGES_EXTRAS:-}"
+
+BREW_CASK_PACKAGES="${BREW_CASK_PACKAGES:-
+  1password
+  alfred
+  arc
+  discord
+  flutter
+  ghostty
+  jetbrains-toolbox
+  obsidian
+  orbstack
+  sublime-merge
+  sublime-text
+  warp
+  yaak
+}
+"
+BREW_CASK_PACKAGES_EXTRAS="${BREW_CASK_PACKAGES_EXTRAS:-}"
+
+# Reserved for cases where you want a Mise-managed version on macOS to
+# override Homebrew. Empty by default since Brew handles things well here.
+MISE_PACKAGES_MACOS="${MISE_PACKAGES_MACOS:-}"
+MISE_PACKAGES_MACOS_EXTRAS="${MISE_PACKAGES_MACOS_EXTRAS:-}"

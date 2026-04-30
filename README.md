@@ -79,20 +79,30 @@ apt-get update && apt-get install -y curl
 Run this one-liner to bootstrap your entire development environment:
 
 ```bash
-BOOTSTRAP=1 bash <(curl -sS https://raw.githubusercontent.com/lucasvienna/dotfiles/master/install)
+bash <(curl -fsSL https://raw.githubusercontent.com/lucasvienna/dotfiles/main/bootstrap)
 ```
 
-The script is idempotent and safe to run multiple times. It will:
+The bootstrap script is idempotent and safe to run multiple times. It will:
 
-1. Prompt before overwriting existing configs
-2. Let you review package lists before installation
-3. Allow you to choose the installation directory
-4. Set up everything in ~5 minutes
+1. Detect your environment (macOS / Debian / Ubuntu / WSL 2)
+2. Install critical packages (Homebrew + Bash on macOS, sudo + git on Linux)
+3. Clone the repo to a directory of your choice
+4. Hand off to `./install`, which prompts before overwriting existing configs
+5. Set up everything in ~5 minutes
 
-**Skip system packages** (if you want to handle them manually):
+After the bootstrap clones the repo, you can re-run the install at any time:
 
 ```bash
-BOOTSTRAP=1 bash <(curl -sS https://raw.githubusercontent.com/lucasvienna/dotfiles/master/install) --skip-system-packages
+cd ~/dotfiles && ./install              # full install
+cd ~/dotfiles && ./install --symlinks   # only re-stow symlinks
+cd ~/dotfiles && ./install --help       # all flags
+```
+
+**Skip system packages** (handle them manually):
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/lucasvienna/dotfiles/main/bootstrap) && \
+  cd ~/dotfiles && ./install --skip-system-packages
 ```
 
 ### Try It First (Docker)
@@ -104,7 +114,7 @@ docker container run --rm -it -e "IN_CONTAINER=1" -v "${PWD}:/app" -w /app debia
 
 # Inside the container:
 apt-get update && apt-get install -y curl \
-  && bash <(curl -sS https://raw.githubusercontent.com/lucasvienna/dotfiles/master/install) \
+  && bash <(curl -fsSL https://raw.githubusercontent.com/lucasvienna/dotfiles/main/bootstrap) --local \
   && zsh -c ". ~/.config/zsh/.zprofile && . ~/.config/zsh/.zshrc; zsh -i"
 ```
 

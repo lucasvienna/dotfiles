@@ -1,0 +1,241 @@
+# shellcheck shell=bash
+# Shared library: env detection, helpers, color codes.
+#
+# Sourced by both ./bootstrap and ./install. When sourced, only definitions
+# happen — no side effects. Callers decide when to invoke detect_env etc.
+
+# -----------------------------------------------------------------------------
+# Color codes
+# -----------------------------------------------------------------------------
+
+export C_RED=$'\e[1;31;1m'
+export C_GREEN=$'\e[1;32;1m'
+export C_YELLOW=$'\e[1;33;1m'
+export C_BLUE=$'\e[1;34;1m'
+export C_MAGENTA=$'\e[1;35;1m'
+export C_CYAN=$'\e[1;36;1m'
+export C_WHITE=$'\e[1;37;1m'
+export C_RESET=$'\e[0m'
+
+# -----------------------------------------------------------------------------
+# Environment vars (populated by detect_env)
+# -----------------------------------------------------------------------------
+
+export CPU_ARCH=
+export OS_TYPE=
+export OS_KERNEL=
+export OS_DISTRO=
+export OS_DISTRO_ORIGINAL=
+export OS_DISTRO_LIKE=
+export OS_VERSION=
+export OS_IN_WSL="0"
+export OS_IN_CONTAINER="${OS_IN_CONTAINER:-${IN_CONTAINER:-0}}"
+
+# NOTE: Defaults for the URLs below are applied lazily by callers, after
+# install-config has been sourced. Defining them here as `:-` would race with
+# install-config setting them to empty strings.
+export DOTFILES_REPO_SLUG
+export DOTFILES_CLONE_URL
+export DOTFILES_UPSTREAM_URL
+export DOTFILES_BRANCH
+
+# Re-apply default values where empty/unset. Idempotent — call after sourcing
+# install-config (or anywhere else that may have set blanks).
+_apply_dotfiles_defaults() {
+  : "${DOTFILES_REPO_SLUG:=lucasvienna/dotfiles}"
+  : "${DOTFILES_CLONE_URL:=https://github.com/${DOTFILES_REPO_SLUG}}"
+  : "${DOTFILES_UPSTREAM_URL:=https://github.com/lucasvienna/dotfiles}"
+  : "${DOTFILES_BRANCH:=main}"
+}
+_apply_dotfiles_defaults
+
+# -----------------------------------------------------------------------------
+# Output helpers
+# -----------------------------------------------------------------------------
+
+_info() {
+  local message="${1}"
+  local pre_message="${2-\n\n}"
+
+  printf "%b%b:: %b%b\n\n" "${pre_message}" "${C_CYAN}" "${message}" "${C_RESET}"
+}
+
+_skipping() {
+  local message="${1}"
+  local pre_message="${2:-}"
+
+  printf "%b%bSkipping: %b%b\n" "${pre_message}" "${C_WHITE}" "${message}" "${C_RESET}"
+}
+
+_warning() {
+  local message="${1}"
+  local pre_message="${2:-}"
+
+  printf "%b%bWarning: %b%b\n" "${pre_message}" "${C_YELLOW}" "${message}" "${C_RESET}"
+}
+
+_error() {
+  local message="${1}"
+  local exit_strategy="${2-1}"
+
+  printf "%bError: %b%b\n" "${C_RED}" "${message}" "${C_RESET}" >&2
+
+  # When sourced, prefer return over exit so the caller stays alive.
+  if [[ "${BASH_SOURCE[0]}" != "${0}" && "${exit_strategy}" == "1" ]]; then
+    exit_strategy="2"
+  fi
+
+  case "${exit_strategy}" in
+  1) exit 1 ;;
+  2) return 1 ;;
+  "") return 0 ;;
+  esac
+}
+
+# -----------------------------------------------------------------------------
+# System helpers
+# -----------------------------------------------------------------------------
+
+_run_as_root() {
+  if command -v sudo >/dev/null 2>&1; then
+    sudo bash -c "${*}"
+  else
+    su -c "${*}"
+  fi
+}
+
+_package_install() {
+  local packages=("${@}")
+
+  case "${OS_DISTRO}" in
+  debian)
+    _run_as_root "apt-get update && apt-get install --yes --no-install-recommends ${packages[*]}"
+    ;;
+  darwin)
+    brew install "${packages[@]}"
+    ;;
+  *)
+    _error "_package_install: unsupported OS_DISTRO '${OS_DISTRO}'"
+    ;;
+  esac
+}
+
+# Print a snapshot of environment state — used by ./install --debug.
+_dotfiles_env() {
+  local commit="-"
+
+  if [[ -d "${DOTFILES_PATH:-}/.git" && -f "${DOTFILES_PATH:-}/install" ]]; then
+    commit="$(git -C "${DOTFILES_PATH}" log -1 --format="%as :: %h :: %s" 2>/dev/null || echo "-")"
+  fi
+
+  cat <<EOF
+CPU_ARCH="${CPU_ARCH}"
+
+OS_TYPE="${OS_TYPE}"
+OS_KERNEL="${OS_KERNEL}"
+OS_DISTRO="${OS_DISTRO_ORIGINAL} (${OS_VERSION})"
+OS_DISTRO_LIKE="${OS_DISTRO_LIKE}"
+
+OS_IN_WSL="${OS_IN_WSL}"
+OS_IN_CONTAINER="${OS_IN_CONTAINER}"
+
+DOTFILES_FIRST_RUN="${DOTFILES_FIRST_RUN:-1}"
+DOTFILES_PATH="${DOTFILES_PATH:-}"
+DOTFILES_CLONE_URL="${DOTFILES_CLONE_URL}"
+DOTFILES_BRANCH="${DOTFILES_BRANCH}"
+DOTFILES_COMMIT="${commit}"
+EOF
+}
+
+# -----------------------------------------------------------------------------
+# Detection
+# -----------------------------------------------------------------------------
+
+detect_env() {
+  case "${OSTYPE}" in
+  linux*)
+    OS_TYPE="linux"
+
+    if [ -r /etc/os-release ]; then
+      # shellcheck disable=SC1091
+      read -r OS_DISTRO OS_DISTRO_LIKE OS_VERSION <<<"$(. /etc/os-release && echo "${ID}" "${ID_LIKE:-"${ID}"}" "${BUILD_ID:-"${VERSION_ID:-"${VERSION_CODENAME:-}"}"}")"
+    else
+      _error "'/etc/os-release' file is missing which is not supported, aborting!"
+    fi
+
+    OS_DISTRO_ORIGINAL="${OS_DISTRO}"
+
+    # ID_LIKE may be a space-separated list. We only care that apt is usable.
+    if [[ "${OS_DISTRO_LIKE}" =~ (ubuntu|debian) ]]; then
+      OS_DISTRO="debian"
+    fi
+
+    if [[ -z "${OS_DISTRO}" || ! "ubuntu debian raspbian" =~ ${OS_DISTRO} ]]; then
+      cat <<EOF >&2
+Your distro identified as: '${OS_DISTRO_ORIGINAL}' (based on: '${OS_DISTRO_LIKE}')
+
+Supported Linux distros are Debian-based. If your distro identifies as one of
+those the expectation is it should work.
+
+If you feel this is a bug please open an issue at: ${DOTFILES_CLONE_URL}
+
+Please include the output of running: cat /etc/os-release
+
+EOF
+      _error "Your distro isn't supported, aborting!"
+    fi
+
+    grep --quiet --ignore-case "microsoft" /proc/version && OS_IN_WSL="1"
+
+    [[ -f "/.dockerenv" || -f "/run/.containerenv" ]] && OS_IN_CONTAINER="1"
+    ;;
+  darwin*)
+    OS_TYPE="darwin"
+    OS_DISTRO="${OS_TYPE}"
+    OS_DISTRO_ORIGINAL="${OS_DISTRO}"
+    OS_DISTRO_LIKE="${OS_DISTRO}"
+    OS_VERSION="$(sw_vers -productVersion 2>/dev/null || uname -r)"
+    ;;
+  *)
+    _error "'${OSTYPE}' isn't supported, aborting!"
+    ;;
+  esac
+
+  OS_KERNEL="$(uname -r)"
+  CPU_ARCH="$(uname -m)"
+}
+
+warn_root() {
+  # Containers run as root by design — don't bother prompting.
+  [[ "${OS_IN_CONTAINER}" == "1" ]] && return 0
+
+  # Root has an effective uid of 0.
+  [ "${EUID:-$(id -u)}" != "0" ] && return 0
+
+  local user="${USER:-$(whoami)}"
+  local sudo_user="${SUDO_USER:-}"
+
+  cat <<EOF
+Root user detected!
+
+$(id)
+
+USER=${user}
+SUDO_USER=${sudo_user}
+
+EOF
+
+  local msg="as root"
+  [ -n "${sudo_user}" ] && msg="with sudo as '${sudo_user}'"
+
+  while true; do
+    printf "This script is meant to run as a non-root user, are you sure you want to run this %s? (y/n) " "${msg}"
+    read -r yn
+
+    case "${yn}" in
+    [Yy]*) break ;;
+    [Nn]*) exit ;;
+    *) _error "'${yn}' is not a valid answer, please input 'y' or 'n'" "" ;;
+    esac
+  done
+}

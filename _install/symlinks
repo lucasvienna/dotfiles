@@ -1,0 +1,31 @@
+# shellcheck shell=bash
+# Symlinks created by the install script via the _stowit wrapper (and a few
+# direct `ln` calls for files that must live outside of XDG_CONFIG_HOME).
+#
+# Override or extend in install-config:
+#   - SYMLINKS / SYMLINKS_WSL: replace the whole list (rare)
+#   - SYMLINKS_EXTRAS / SYMLINKS_WSL_EXTRAS: append your own (common)
+
+if [[ -z "${SYMLINKS[*]:-}" ]]; then
+  SYMLINKS=(
+    "_stowit -d \"\${DOTFILES_PATH}/.local\" -t \"\${HOME}/.local/bin\" bin"
+    "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/btop\" btop"
+    "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/fzf\" fzf"
+    "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/ghostty\" ghostty"
+    "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/git\" git"
+    "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/nvim\" nvim"
+    "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/starship\" starship"
+    "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/tmux\" tmux"
+    "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/zsh\" --ignore=\"^\\.zshenv$\" zsh"
+    "ln -fns \"\${DOTFILES_PATH}/.config/zsh/.zshenv\" \"\${HOME}/.zshenv\""
+  )
+fi
+SYMLINKS_EXTRAS="${SYMLINKS_EXTRAS:-}"
+
+if [[ -z "${SYMLINKS_WSL[*]:-}" ]]; then
+  SYMLINKS_WSL=(
+    "cp \"\${DOTFILES_PATH}/wsl/.wslconfig\" \"/mnt/c/Users/%WindowsUser/.wslconfig\" || true"
+    "sudo ln -fns \"\${DOTFILES_PATH}/etc/wsl.conf\" \"/etc/wsl.conf\""
+  )
+fi
+SYMLINKS_WSL_EXTRAS="${SYMLINKS_WSL_EXTRAS:-}"

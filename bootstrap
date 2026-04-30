@@ -1,0 +1,234 @@
+#!/usr/bin/env bash
+# First-run bootstrap for these dotfiles.
+#
+# This is what you run on a fresh system to get from "nothing installed" to
+# "ready to ./install". It detects the OS, installs critical packages
+# (Homebrew + bash on macOS, sudo + git on Debian), clones the repo, and
+# kicks off the install script.
+#
+# Examples:
+#   ./bootstrap          # Standard first-run, clones from DOTFILES_CLONE_URL
+#   ./bootstrap --local  # Copy from $PWD instead of cloning (useful in tests/containers)
+#
+# Curl-pipe entry point:
+#   bash <(curl -fsSL https://raw.githubusercontent.com/lucasvienna/dotfiles/main/bootstrap)
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# Critical packages installed before the main script can run. Bash 4+ is
+# required on macOS (the system Bash is 3.2).
+export PACKAGES_CRITICAL=("less" "git" "nano")
+
+export LOCAL="0"
+export DOTFILES_FIRST_RUN="1"
+export DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/dotfiles}"
+
+for arg in "${@}"; do
+  case "${arg}" in
+  --local)
+    LOCAL="1"
+    shift
+    ;;
+  esac
+done
+
+# When sourced/executed directly, _install/env may live next to this script
+# (running from a clone) or need to be downloaded first (curl-pipe install).
+_self_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_env_file="${_self_dir}/_install/env"
+
+if [ -f "${_env_file}" ]; then
+  # shellcheck disable=SC1090
+  source "${_env_file}"
+else
+  # Curl-pipe scenario: pull just enough scaffolding to get going. Once we
+  # clone the full repo below, the real _install/env takes over.
+  _tmp_env="$(mktemp)"
+  curl -fsSL "https://raw.githubusercontent.com/${DOTFILES_REPO_SLUG:-lucasvienna/dotfiles}/${DOTFILES_BRANCH:-main}/_install/env" -o "${_tmp_env}"
+  # shellcheck disable=SC1090
+  source "${_tmp_env}"
+  rm -f "${_tmp_env}"
+fi
+
+# -----------------------------------------------------------------------------
+# Phase functions
+# -----------------------------------------------------------------------------
+
+install_homebrew() {
+  _info "INSTALL HOMEBREW"
+
+  local brew_prefix="/opt/homebrew"
+  [ "${CPU_ARCH}" != "arm64" ] && brew_prefix="/usr/local"
+
+  local brew_bin="${brew_prefix}/bin/brew"
+
+  if [ -x "${brew_bin}" ]; then
+    _skipping "Already installed at ${brew_bin}"
+    eval "$(${brew_bin} shellenv)"
+    return
+  fi
+
+  NONINTERACTIVE=1 /bin/bash -c \
+    "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+  eval "$(${brew_bin} shellenv)"
+}
+
+ensure_sudo_works() {
+  _info "ENSURE SUDO WORKS"
+
+  if ! command -v sudo >/dev/null 2>&1; then
+    su -c "apt-get update && apt-get install --yes sudo"
+  fi
+
+  if sudo --validate >/dev/null 2>&1; then
+    echo "Confirmed, sudo is working"
+    return
+  fi
+
+  local sudoers_dir="/etc/sudoers.d"
+  local real_user="${SUDO_USER:-${USER:-$(whoami)}}"
+  local user_file="${sudoers_dir}/00_${real_user}"
+  local user_entry="${real_user} ALL=(ALL:ALL) ALL"
+
+  _run_as_root "mkdir -p ${sudoers_dir} && echo '${user_entry}' > ${user_file} && chmod 0440 ${user_file}"
+
+  echo "'${user_file}' was created with '${user_entry}'"
+
+  sudo --validate
+}
+
+install_critical_packages() {
+  _info "INSTALL CRITICAL PACKAGES"
+
+  if [ "${OS_TYPE}" == "darwin" ]; then
+    # Bash 3.2 ships with macOS but the install script needs 4+.
+    PACKAGES_CRITICAL+=("bash")
+  fi
+
+  _package_install "${PACKAGES_CRITICAL[@]}"
+}
+
+_local_clone() {
+  [ "${LOCAL}" != "1" ] && return 1
+
+  local source_path
+  source_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+  if [ "$(realpath "${source_path}")" == "$(realpath "${DOTFILES_PATH}")" ]; then
+    _skipping "'${source_path}' is already your dotfiles path"
+  else
+    cp -R "${source_path}/." "${DOTFILES_PATH}"
+    cp -n "${DOTFILES_PATH}/install-config.example" "${DOTFILES_PATH}/install-config" 2>/dev/null || true
+  fi
+
+  echo "Locally copied from '${source_path}' to '${DOTFILES_PATH}'"
+}
+
+clone_dotfiles() {
+  _info "CLONE DOTFILES"
+
+  cat <<EOF
+Your dotfiles path is where the repo will live on disk. You can change this
+later. Nothing else gets installed yet — this only clones the repo:
+
+DOTFILES_CLONE_URL="${DOTFILES_CLONE_URL}"
+DOTFILES_BRANCH="${DOTFILES_BRANCH}"
+
+EOF
+
+  [ "${LOCAL}" == "1" ] && printf "%bSince you've used --local, it will get copied from your \$PWD instead of the clone URL.%b\n\n" "${C_WHITE}" "${C_RESET}"
+
+  while true; do
+    printf "Where would you like to clone these dotfiles to [%s]? " "${DOTFILES_PATH}"
+    read -r dotfiles_path
+
+    [ -z "${dotfiles_path}" ] && dotfiles_path="${DOTFILES_PATH}"
+
+    DOTFILES_PATH="${dotfiles_path/#~/${HOME}}"
+    DOTFILES_PATH="${DOTFILES_PATH%/}"
+
+    if [ -e "${DOTFILES_PATH}" ]; then
+      _error "'${DOTFILES_PATH}' already exists, it must be a new directory\n" ""
+    else
+      break
+    fi
+  done
+
+  echo
+
+  mkdir -p "${DOTFILES_PATH}"
+
+  _local_clone && return
+
+  git clone --branch "${DOTFILES_BRANCH}" "${DOTFILES_CLONE_URL}" "${DOTFILES_PATH}"
+
+  if ! git -C "${DOTFILES_PATH}" remote | grep --quiet --word-regexp upstream; then
+    git -C "${DOTFILES_PATH}" remote add upstream "${DOTFILES_UPSTREAM_URL}.git" 2>/dev/null || true
+  fi
+
+  cp -n "${DOTFILES_PATH}/install-config.example" "${DOTFILES_PATH}/install-config"
+}
+
+next_steps() {
+  _info "NEXT STEPS"
+
+  cat <<EOF
+${C_GREEN}The repo is cloned. Time to install.${C_RESET}
+
+${C_YELLOW}What would you like to do next?${C_RESET}
+
+1) Install dotfiles
+2) Review which packages get installed (and edit install-config)
+
+${C_MAGENTA}You can also CTRL+c out and browse the repo first. When you're ready:
+
+cd "${DOTFILES_PATH}" && ./install${C_RESET}
+EOF
+
+  while true; do
+    printf "\nPick an option: "
+    read -r option
+
+    case "${option}" in
+    1) break ;;
+    2)
+      local pkg_file="${DOTFILES_PATH}/_install/packages/${OS_DISTRO}"
+      [ -f "${pkg_file}" ] && less "${pkg_file}"
+      ${EDITOR:-nano} "${DOTFILES_PATH}/install-config"
+      next_steps
+      ;;
+    *) _error "'${option}' isn't a valid choice, pick 1 or 2" "" ;;
+    esac
+  done
+
+  cd "${DOTFILES_PATH}" && exec "./install"
+}
+
+# -----------------------------------------------------------------------------
+# Main
+# -----------------------------------------------------------------------------
+
+main() {
+  _info "DETECT ENVIRONMENT"
+  detect_env
+  _dotfiles_env
+
+  warn_root
+
+  if [ "${OS_TYPE}" == "darwin" ]; then
+    install_homebrew
+  else
+    ensure_sudo_works
+  fi
+
+  install_critical_packages
+  clone_dotfiles
+  next_steps
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  main "${@:-}"
+fi
