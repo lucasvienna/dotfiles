@@ -79,7 +79,6 @@ alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resource
 alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v extension-process | tr -s ' ' | cut -d ' ' -f2 | xargs kill"
 
 # Networking
-alias myip="curl https://ifconfig.me; echo | tee clip-copy"
 alias ports="lsof -i -P -n | grep LISTEN"
 alias k8080="lsof -ti tcp:8080 | xargs -r kill"
 

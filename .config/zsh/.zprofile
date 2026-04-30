@@ -9,30 +9,28 @@ export XDG_CACHE_HOME="${HOME}/.cache"
 export XDG_DATA_HOME="${HOME}/.local/share"
 export XDG_STATE_HOME="${HOME}/.local/state"
 
-# Explicitly set the temp directory
-export TMPDIR="/tmp"
-
 # Add all local binaries to the system path and make sure they are first.
-export PATH="$HOME/bin:$HOME/.local/bin:$HOME/.local/bin/local:$PATH"
+export PATH="${HOME}/.local/bin:${HOME}/.local/bin/local:${PATH}"
 
 # Confiure Mise (programming language run-time manager).
 export PATH="${XDG_DATA_HOME}/mise/shims:${PATH}"
 
-# Configure GPG.
+# Configure GPG
 export GNUPGHOME="${XDG_CONFIG_HOME}/gnupg"
-export GPG_TTY=$(tty)
 
-# Add colors to the less and man commands.
+# Add colors to the less command.
 export LESS=-R
-LESS_TERMCAP_ue="$(printf '%b' '[0m')"
-export LESS_TERMCAP_ue
-export LESS_TERMCAP_mb=$'\e[1;31mm'   # begin blinking
+export LESS_TERMCAP_mb=$'\e[1;31m'    # begin blinking
 export LESS_TERMCAP_md=$'\e[1;36m'    # begin bold
-export LESS_TERMCAP_us=$'\e[1;332m'   # begin underline
-export LESS_TERMCAP_so=$'\e[1;44;33m' # begin standout-mode - info box
+export LESS_TERMCAP_us=$'\e[1;32m'    # begin underline
+export LESS_TERMCAP_so=$'\e[1;30;44m' # begin standout-mode - info box
 export LESS_TERMCAP_me=$'\e[0m'       # end mode
 export LESS_TERMCAP_ue=$'\e[0m'       # end underline
 export LESS_TERMCAP_se=$'\e[0m'       # end standout-mode
+
+# Use bat to colorize man pages.
+export MANROFFOPT="-c"
+export MANPAGER="sh -c 'col -bx | bat --language man --plain'"
 
 # Configure delta (diffs) defaults.
 # https://dandavison.github.io/delta/environment-variables.html
@@ -55,16 +53,7 @@ export HOMEBREW_NO_ANALYTICS=1
 export DO_NOT_TRACK=1
 
 # rust
-export PATH="$HOME/.cargo/bin:$PATH"
-
-# ruby gems
-export PATH="$HOME/.gem/bin:$PATH"
-
-# brew kegs that we want to replace the system tools with
-export PATH="/usr/local/opt/curl/bin:$PATH"               # curl
-export PATH="/usr/local/opt/ruby/bin:$PATH"               # ruby
-export PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH" # sed
-export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"    # grep, egrep, fgrep
+export PATH="${HOME}/.cargo/bin:${PATH}"
 
 # Added by OrbStack: command-line tools and integration
 # This won't be added again if you remove it.

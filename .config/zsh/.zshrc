@@ -45,6 +45,11 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
+# Set per-shell so gpg-agent's pinentry targets the current tty (matters for
+# SSH signing, GPG signing, and any prompt that has to attach to the user's
+# terminal).
+export GPG_TTY=$(tty)
+
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='vim'
@@ -54,6 +59,12 @@ fi
 
 # Enable mise automatic activation
 eval "$(mise activate zsh)"
+
+# fzf: load shared opts (FZF_DEFAULT_OPTS / _COMMAND / CTRL_T_OPTS) and the
+# native shell integration (CTRL+T file picker, CTRL+R history, ALT+C cd).
+# shellcheck disable=SC1091
+[ -f "${XDG_CONFIG_HOME}/fzf/config.sh" ] && . "${XDG_CONFIG_HOME}/fzf/config.sh"
+command -v fzf >/dev/null 2>&1 && source <(fzf --zsh)
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
