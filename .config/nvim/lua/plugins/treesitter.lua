@@ -10,14 +10,8 @@ return {
       -- Add custom treesitters not present by default in LazyVim.
       ensure_installed = {
         "csv",
-        "dockerfile",
-        "go",
-        "hcl",
-        "helm",
         "ini",
         "nginx",
-        "terraform",
-        "toml",
       },
     },
   },
