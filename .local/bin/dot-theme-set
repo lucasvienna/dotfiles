@@ -2,9 +2,10 @@
 # Set a theme by name, if omit then a random theme will be chosen.
 #
 # Usage:
-#   dot-theme-set --list
-#   dot-theme-set NAME
-#   dot-theme-set
+#   dot-theme-set --list     # Print available themes
+#   dot-theme-set --current  # Print the current theme
+#   dot-theme-set NAME       # Provide a specific theme
+#   dot-theme-set            # Pick a random theme
 
 set -o errexit
 set -o pipefail
@@ -14,6 +15,23 @@ set -o nounset
 . "${DOTFILES_PATH}/install"
 
 THEME="${1:-}"
+
+if [ "${THEME}" = "--list" ]; then
+  find "${DOTFILES_PATH}/themes" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; |
+    sort
+  exit
+fi
+
+if [ "${THEME}" = "--current" ]; then
+  active_theme_path="${HOME}/.config/fzf/theme.sh"
+
+  if [[ -L "${active_theme_path}" && -e "${active_theme_path}" ]]; then
+    basename "$(dirname "$(readlink -f "${active_theme_path}")")"
+  else
+    echo "tokyonight-moon"
+  fi
+  exit
+fi
 
 if [ -z "${THEME}" ]; then
   # Pick a random theme and avoid using shuf since it doesn't exist on macOS
@@ -25,9 +43,4 @@ if [ -z "${THEME}" ]; then
   )"
 fi
 
-if [ "${THEME}" = "--list" ]; then
-  find "${DOTFILES_PATH}/themes" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; |
-    sort
-else
-  set_theme "${THEME}"
-fi
+set_theme "${THEME}"

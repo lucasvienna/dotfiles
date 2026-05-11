@@ -1,0 +1,109 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "padding": {
+      "top": 1,
+      "right": 3,
+      "left": 2
+    }
+  },
+  "modules": [
+    "break",
+    {
+      "type": "cpu",
+      "key": "╭─󰍛 ",
+      "keyColor": "green"
+    },
+    {
+      "type": "memory",
+      "key": "├─ ",
+      "keyColor": "green"
+    },
+    {
+      "type": "gpu",
+      "key": "├─ ",
+      "format": "{name}{?dedicated-total} ({dedicated-total}){?}",
+      "driverSpecific": true,
+      "keyColor": "green"
+    },
+    {
+      "type": "display",
+      "key": "├─󰍹 ",
+      "keyColor": "green"
+    },
+    {
+      "type": "disk",
+      "key": "├─ ",
+      "keyColor": "green"
+    },
+    {
+      "type": "swap",
+      "key": "╰─󰾵 ",
+      "keyColor": "green"
+    },
+    "break",
+    {
+      "type": "title",
+      "key": "╭─ ",
+      "format": "{user-name}@{host-name}",
+      "keyColor": "blue"
+    },
+    {
+      "type": "os",
+      "key": "├─{icon} ",
+      "format": "{pretty-name}",
+      "keyColor": "blue"
+    },
+    {
+      "type": "kernel",
+      "key": "├─ ",
+      "keyColor": "blue"
+    },
+    {
+      "type": "packages",
+      "key": "╰─󰏖 ",
+      "keyColor": "blue"
+    },
+    "break",
+    {
+      "type": "custom",
+      "key": "╭─󱠶 ",
+      "format": "Dotfiles",
+      "keyColor": "yellow"
+    },
+    {
+      "type": "wm",
+      "key": "├─ ",
+      "keyColor": "yellow"
+    },
+    {
+      "type": "command",
+      "key": "├─ ",
+      "text": "[ -z \"${FASTFETCH_DISABLE_THEME}\" ] && printf '\\e[90m■ \\e[97m■ \\e[96m■ \\e[95m■ \\e[94m■ \\e[93m■ \\e[92m■ \\e[91m■\\e[0m (%s)\n' \"$(dot-theme-set --current)\"",
+      "keyColor": "yellow"
+    },
+    {
+      "type": "terminal",
+      "key": "├─ ",
+      "keyColor": "yellow"
+    },
+    {
+      "type": "shell",
+      "key": "╰─ ",
+      "keyColor": "yellow"
+    },
+    "break",
+    {
+      "type": "uptime",
+      "key": "╭─󰔛  Uptime",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "command",
+      "key": "╰─  OS Age",
+      "text": "echo $(dot-birthday)",
+      "keyColor": "magenta"
+    },
+    "break"
+  ]
+}

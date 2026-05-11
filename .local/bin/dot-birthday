@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Report back the number of days since your root file system was created.
+
+if [[ "${OSTYPE}" == linux* ]]; then
+  birthday_timestamp="$(stat -c "%W" /)"
+  birthday_formatted=$(date -d "@${birthday_timestamp}" +"%Y-%m-%d")
+else
+  birthday_timestamp="$(stat -f "%B" /var/db/.AppleSetupDone)"
+  birthday_formatted=$(date -r "${birthday_timestamp}" +"%Y-%m-%d")
+fi
+
+echo "$((($(date +%s) - birthday_timestamp) / 86400)) days (${birthday_formatted})"

@@ -10,6 +10,7 @@ if [[ -z "${SYMLINKS[*]:-}" ]]; then
   SYMLINKS=(
     "_stowit -d \"\${DOTFILES_PATH}/.local\" -t \"\${HOME}/.local/bin\" bin"
     "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/btop\" btop"
+    "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/fastfetch\" fastfetch"
     "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/fzf\" fzf"
     "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/ghostty\" ghostty"
     "_stowit -d \"\${DOTFILES_PATH}/.config\" -t \"\${HOME}/.config/git\" git"
