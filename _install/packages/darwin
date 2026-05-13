@@ -62,15 +62,13 @@ BREW_CASK_PACKAGES="${BREW_CASK_PACKAGES:-
   alfred
   arc
   discord
-  flutter
   ghostty
   jetbrains-toolbox
   obsidian
   orbstack
   sublime-merge
-  sublime-text
-  warp
   yaak
+  zed
 }
 "
 BREW_CASK_PACKAGES_EXTRAS="${BREW_CASK_PACKAGES_EXTRAS:-}"
