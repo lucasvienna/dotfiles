@@ -284,7 +284,7 @@ Note: Systemd is intentionally disabled to avoid the 10-15 second startup delay.
 ├── tmux/          # Tmux with TPM
 ├── zsh/           # Zsh with Oh-My-Zsh (+ .zshrc.arch on Arch)
 ├── git/           # Git with delta, signing
-├── alacritty/     # Terminal emulator (imports theme.toml + local.toml)
+├── alacritty/     # Terminal (alacritty.toml imports base + theme + local)
 ├── ghostty/       # Terminal emulator
 ├── fzf/           # Fuzzy finder
 ├── bottom/        # System monitor (base.toml, merged with theme styles)

@@ -204,7 +204,7 @@ Special case: `.zshenv` must be in `$HOME`, so it's linked directly with
 
 ```
 themes/tokyonight-moon/
-├── alacritty.toml       # Terminal colors, imported via [general] import
+├── alacritty.toml       # Terminal colors, imported via base.toml's import list
 ├── bottom-styles.toml   # btm [styles.*] — concatenated, not symlinked
 ├── btop.theme           # System monitor colors
 ├── fzf.sh               # Fuzzy finder FZF_DEFAULT_OPTS
@@ -222,7 +222,12 @@ themes/tokyonight-moon/
   `~/.config/bottom/bottom.toml`. The two halves must keep declaring disjoint
   tables (`[flags]`/`[processes]` vs `[styles.*]`) or the result stops being
   valid TOML. This is the only generated config in the repo.
-- **alacritty** does support imports, so it gets a normal `theme.toml` symlink —
+- **alacritty** does support imports, so it gets a normal `theme.toml` symlink.
+  Note `alacritty.toml` contains *nothing but the import list*: alacritty loads
+  the importing file last and lets it replace whatever its imports set, so any
+  setting placed there could never be overridden from `local.toml`. Shared
+  settings live in `base.toml` instead, and the order
+  `base.toml → theme.toml → local.toml` then means what it looks like —
   and because `live_config_reload` is on, running terminals repaint with no
   signal at all.
 
@@ -270,10 +275,12 @@ carrying structure with `{{PlaceholderName}}` tokens instead of hex values.
 - `set_theme` detects a theme that has templates but no rendered output and
   points at `dot-theme-fetch` rather than just failing.
 
-Note `_themes/dracula-pro/tmux.conf` is byte-identical to the tokyonight-moon
-one — a copy/paste leftover, so the Dracula theme currently renders tmux in
-tokyonight blues. It contains no licensed colours, which is why it needs no
-templating, but it is a bug worth fixing.
+`_themes/dracula-pro/tmux.conf` used to be byte-identical to the tokyonight-moon
+one — a copy/paste leftover that rendered tmux in tokyonight blues under the
+Dracula theme. It's now templated against the palette like the rest, mapping
+each role to its Dracula equivalent: accent → `Purple`, dim borders and the
+selection background → `Selection`, muted text and the active border →
+`Comment`, and the status bar background → `Background`.
 
 ### Package Management
 
