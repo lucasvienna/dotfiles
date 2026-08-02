@@ -26,8 +26,8 @@
 
 A comprehensive developer environment setup that gets you from zero to
 productive in minutes. These dotfiles automate the installation and
-configuration of modern development tools across macOS, Debian, Ubuntu, and
-WSL 2.
+configuration of modern development tools across macOS, Debian, Ubuntu, Arch
+(including CachyOS), and WSL 2.
 
 ## What's Included
 
@@ -37,12 +37,17 @@ WSL 2.
 - **Terminal Multiplexer**: Tmux with sensible defaults and TPM plugin manager
 - **Editor**: Neovim with LazyVim framework, LSP support, and custom
   configurations
-- **Modern CLI Tools**: ripgrep, fd, fzf, btop, lazygit, delta, and more
+- **Modern CLI Tools**: ripgrep, fd, fzf, btop, bottom, lazygit, delta, and more
+- **Navigation**: ghq for repository management, zoxide for frecency-based `cd`
 - **Development**: Node, Python, Go, Rust, Bun via Mise runtime manager
 - **Security**: SSH/GPG key generation and Git commit signing
 - **Theming**: System-wide theme switching across all applications
 
-**Platform Support:** macOS, Debian, Ubuntu, WSL 2
+**Platform Support:** macOS, Debian, Ubuntu, Arch / CachyOS, WSL 2
+
+Tools come from the platform's own package manager where that manager keeps
+up: APT plus Mise on Debian, Homebrew on macOS, and plain pacman plus the AUR
+on Arch — no Mise tool layer there, since the repos are already current.
 
 ## Quick Start
 
@@ -54,6 +59,12 @@ You'll need `curl` and Bash 4+ installed:
 
 ```bash
 apt-get update && apt-get install -y curl
+```
+
+**Arch/CachyOS:**
+
+```bash
+sudo pacman -Sy --needed curl
 ```
 
 **macOS (Apple Silicon):**
@@ -84,10 +95,12 @@ bash <(curl -fsSL https://raw.githubusercontent.com/lucasvienna/dotfiles/main/bo
 
 The bootstrap script is idempotent and safe to run multiple times. It will:
 
-1. Detect your environment (macOS / Debian / Ubuntu / WSL 2)
+1. Detect your environment (macOS / Debian / Ubuntu / Arch / WSL 2)
 2. Install critical packages (Homebrew + Bash on macOS, sudo + git on Linux)
 3. Clone the repo to a directory of your choice
-4. Hand off to `./install`, which prompts before overwriting existing configs
+4. Hand off to `./install`, which moves any existing config aside as a `.bak`
+   before symlinking over it — nothing is deleted, and existing backups are
+   never overwritten
 5. Set up everything in ~5 minutes
 
 After the bootstrap clones the repo, you can re-run the install at any time:
@@ -133,12 +146,18 @@ dot-theme-set tokyonight-moon
 dot-theme-set
 ```
 
-Themes update automatically across Neovim, tmux, fzf, btop, Ghostty, and gitui.
+Themes update automatically across Neovim, tmux, fzf, btop, bottom, Alacritty,
+Ghostty, and gitui.
+
+Alacritty repaints instantly (it imports the theme and has
+`live_config_reload` on), btop and Ghostty reload on a signal, and `btm` needs
+a restart — bottom has no reload mechanism, so `dot-theme-set` tells you when
+one is running.
 
 ### Included Themes
 
 - **Tokyonight Moon**: High contrast, excellent for recordings
-- **Gruvbox Dark**: Warm colors, easy on the eyes
+- **Catppuccin Macchiato**: Soft pastels on a medium-dark base
 - **Dracula Pro**: Modern dark theme with vibrant accents
 
 Add your own themes by creating a new directory in `themes/` with configs for
@@ -180,8 +199,15 @@ cd "${DOTFILES_PATH}"
 Copy `install-config.example` to `install-config` and customize:
 
 ```bash
-# Add extra packages
+# Add extra packages (per platform)
 export BREW_PACKAGES_EXTRAS="package1 package2"
+export APT_PACKAGES_EXTRAS="package1 package2"
+export PACMAN_PACKAGES_EXTRAS="package1 package2"
+export AUR_PACKAGES_EXTRAS="package1 package2"
+
+# Arch only: pin an AUR helper. Empty auto-detects paru, then yay, then
+# shelly, and builds paru from the AUR if none are installed.
+export AUR_HELPER="shelly"
 
 # Add programming languages
 export MISE_LANGUAGES_EXTRAS["ruby"]="ruby@3.4"
@@ -201,6 +227,7 @@ These files are sourced but never tracked:
 - `.config/zsh/.zshrc.local` - Shell customizations
 - `.config/zsh/.aliases.local` - Custom aliases
 - `.config/git/config.local` - Git configuration
+- `.config/alacritty/local.toml` - Per-machine font, size and window title
 
 ### Method 3: Fork & Branch
 
@@ -238,10 +265,12 @@ Note: Systemd is intentionally disabled to avoid the 10-15 second startup delay.
 .config/           # Application configurations
 ├── nvim/          # Neovim (LazyVim)
 ├── tmux/          # Tmux with TPM
-├── zsh/           # Zsh with Oh-My-Zsh
+├── zsh/           # Zsh with Oh-My-Zsh (+ .zshrc.arch on Arch)
 ├── git/           # Git with delta, signing
+├── alacritty/     # Terminal emulator (imports theme.toml + local.toml)
 ├── ghostty/       # Terminal emulator
 ├── fzf/           # Fuzzy finder
+├── bottom/        # System monitor (base.toml, merged with theme styles)
 └── btop/          # System monitor
 
 .local/bin/        # Custom scripts
@@ -249,6 +278,12 @@ Note: Systemd is intentionally disabled to avoid the 10-15 second startup delay.
 ├── clip-copy      # Cross-platform clipboard
 ├── clip-paste     # Clipboard utilities
 └── mkscript       # Script generator
+
+_install/          # Installer data, separate from install's logic
+├── env            # Shared helpers, OS + AUR helper detection
+├── packages/      # Per-OS package lists: debian, darwin, arch
+├── mise_languages # Language runtimes
+└── symlinks       # Stow rules
 
 themes/            # System-wide themes
 install            # Main installation script

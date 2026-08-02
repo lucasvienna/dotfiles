@@ -3,7 +3,7 @@
 # User overrides for ./install. Copy to install-config (gitignored) and edit.
 #
 # The defaults you'd be overriding live in:
-#   - _install/packages/{debian,darwin}   # APT/Brew/Mise package lists
+#   - _install/packages/{debian,darwin,arch}   # APT/Brew/Pacman/Mise lists
 #   - _install/mise_languages              # Mise programming languages
 #   - _install/symlinks                    # GNU Stow / ln symlink rules
 #   - _install/env                         # Shared helpers + URLs
@@ -33,6 +33,15 @@ export YOUR_EMAIL=
 # -----------------------------------------------------------------------------
 export APT_PACKAGES=
 export APT_PACKAGES_EXTRAS=
+
+export PACMAN_PACKAGES=
+export PACMAN_PACKAGES_EXTRAS=
+export AUR_PACKAGES=
+export AUR_PACKAGES_EXTRAS=
+
+# Arch only. One of: paru, yay, shelly. Left empty they're detected in that
+# order, and paru is built from the AUR if none of them are installed.
+export AUR_HELPER=
 
 export BREW_PACKAGES=
 export BREW_PACKAGES_EXTRAS=

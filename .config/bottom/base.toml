@@ -1,0 +1,19 @@
+# Shared bottom settings.
+#
+# bottom has no config import mechanism, so `dot-theme-set` concatenates this
+# file with themes/${THEME}/bottom-styles.toml into ~/.config/bottom/bottom.toml.
+# Keep [styles] tables out of here — they live in the theme files, and the two
+# halves must declare disjoint tables for the concatenation to stay valid TOML.
+#
+# bottom can't reload its config, so restart `btm` after switching themes.
+# Keys below are the non-deprecated ones as of bottom 0.14.
+
+[flags]
+rate = "1s"
+temperature_type = "celsius"
+dot_marker = false
+
+[processes]
+default_grouped = false
+default_tree = false
+default_memory_value = true

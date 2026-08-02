@@ -3,7 +3,7 @@
 #
 # This is what you run on a fresh system to get from "nothing installed" to
 # "ready to ./install". It detects the OS, installs critical packages
-# (Homebrew + bash on macOS, sudo + git on Debian), clones the repo, and
+# (Homebrew + bash on macOS, sudo + git on Debian and Arch), clones the repo, and
 # kicks off the install script.
 #
 # Examples:
@@ -80,7 +80,10 @@ ensure_sudo_works() {
   _info "ENSURE SUDO WORKS"
 
   if ! command -v sudo >/dev/null 2>&1; then
-    su -c "apt-get update && apt-get install --yes sudo"
+    case "${OS_DISTRO}" in
+    debian) su -c "apt-get update && apt-get install --yes sudo" ;;
+    arch) su -c "pacman -Sy --needed --noconfirm sudo" ;;
+    esac
   fi
 
   if sudo --validate >/dev/null 2>&1; then

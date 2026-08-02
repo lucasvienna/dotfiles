@@ -1,0 +1,52 @@
+
+[styles]
+
+[styles.cpu]
+all_entry_colour = "#c8d3f5"
+avg_entry_colour = "#ff757f"
+cpu_core_colours = [
+  "#82aaff",
+  "#c3e88d",
+  "#ffc777",
+  "#c099ff",
+  "#86e1fc",
+  "#4fd6be",
+  "#ff966c",
+  "#65bcff",
+]
+
+[styles.temp_graph]
+temp_graph_colour_styles = ["#4fd6be", "#c3e88d", "#ffc777", "#ff966c", "#ff757f"]
+
+[styles.memory]
+ram_colour = "#82aaff"
+cache_colour = "#86e1fc"
+swap_colour = "#ffc777"
+arc_colour = "#4fd6be"
+gpu_colours = ["#c099ff", "#c3e88d", "#ff966c", "#65bcff", "#ff007c"]
+
+[styles.network]
+rx_colour = "#c3e88d"
+tx_colour = "#ff757f"
+rx_total_colour = "#86e1fc"
+tx_total_colour = "#ffc777"
+
+[styles.battery]
+high_battery_colour = "#c3e88d"
+medium_battery_colour = "#ffc777"
+low_battery_colour = "#ff757f"
+
+[styles.tables]
+headers = { colour = "#82aaff", bold = true }
+
+[styles.graphs]
+graph_colour = "#636da6"
+legend_text = { colour = "#828bb8" }
+
+[styles.widgets]
+border_colour = "#589ed7"
+selected_border_colour = "#c099ff"
+widget_title = { colour = "#c8d3f5", bold = true }
+text = { colour = "#c8d3f5" }
+selected_text = { colour = "#222436", bg_colour = "#82aaff" }
+disabled_text = { colour = "#636da6" }

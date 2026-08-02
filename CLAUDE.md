@@ -7,7 +7,7 @@ code in this repository.
 
 This is Lucas Vienna's dotfiles repository - a comprehensive developer
 environment setup that automates installation and configuration across macOS,
-Debian, Ubuntu, and WSL 2. The system manages shell configuration (zsh),
+Debian, Ubuntu, Arch (including CachyOS), and WSL 2. The system manages shell configuration (zsh),
 terminal multiplexer (tmux), text editor (Neovim), and system-wide theming with
 a single install script.
 
@@ -67,6 +67,7 @@ dot-theme-set
 Available themes:
 
 - `tokyonight-moon` - High contrast, excellent for video recording
+- `catppuccin-macchiato` - Soft pastels on a medium-dark base
 - `dracula-pro` - Modern dark theme with vibrant accents
 
 ### Development Workflow
@@ -175,7 +176,16 @@ _stowit -d "${DOTFILES_PATH}/.config" -t "${HOME}/.config/nvim" nvim
 
 - Creates symlinks from source directory into target
 - `--ignore` regex excludes patterns (e.g., `.local` files)
-- `-R` adopts existing files (non-destructive)
+- `-R` is `--restow`: it removes and re-creates *its own* symlinks. It does
+  **not** adopt pre-existing real files — stow refuses those outright with
+  "cannot stow ... over existing target".
+- `_stowit` therefore calls `_backup_stow_conflicts` first, which moves any
+  real (non-symlink) file that would collide to `<name>.bak`, or `.bak.N` if
+  that's taken. Nothing is deleted and no backup is ever overwritten, so it
+  needs no prompt. Re-running is idempotent: after the first pass the target is
+  a symlink, which no longer counts as a conflict.
+- This matters because distro-shipped configs are common — CachyOS ships an
+  `~/.config/alacritty/alacritty.toml`.
 
 Special case: `.zshenv` must be in `$HOME`, so it's linked directly with
 `ln -fns`.
@@ -186,13 +196,31 @@ Special case: `.zshenv` must be in `$HOME`, so it's linked directly with
 
 ```
 themes/tokyonight-moon/
-├── btop.theme      # System monitor colors
-├── fzf.sh          # Fuzzy finder FZF_DEFAULT_OPTS
-├── ghostty         # Terminal emulator theme
-├── gitui.ron       # Git UI theme (Rust Object Notation)
-├── nvim.lua        # LazyVim colorscheme plugin config
-└── tmux.conf       # Status bar colors
+├── alacritty.toml       # Terminal colors, imported via [general] import
+├── bottom-styles.toml   # btm [styles.*] — concatenated, not symlinked
+├── btop.theme           # System monitor colors
+├── fzf.sh               # Fuzzy finder FZF_DEFAULT_OPTS
+├── ghostty              # Terminal emulator theme
+├── gitui.ron            # Git UI theme (Rust Object Notation)
+├── nvim.lua             # LazyVim colorscheme plugin config
+└── tmux.conf            # Status bar colors
 ```
+
+**Two apps break the plain-symlink pattern:**
+
+- **bottom** has no config import mechanism and its `[styles] theme` key only
+  accepts built-ins, so `set_theme()` concatenates `.config/bottom/base.toml`
+  with `themes/${THEME}/bottom-styles.toml` into a *generated*
+  `~/.config/bottom/bottom.toml`. The two halves must keep declaring disjoint
+  tables (`[flags]`/`[processes]` vs `[styles.*]`) or the result stops being
+  valid TOML. This is the only generated config in the repo.
+- **alacritty** does support imports, so it gets a normal `theme.toml` symlink —
+  and because `live_config_reload` is on, running terminals repaint with no
+  signal at all.
+
+Reload mechanics differ per app: Ghostty and btop take `SIGUSR2`, tmux gets
+`source-file`, alacritty is automatic, and **bottom cannot reload** — `btm` has
+to be restarted, which `set_theme()` warns about when one is running.
 
 **How it works**:
 
@@ -213,21 +241,43 @@ themes/tokyonight-moon/
 
 ### Package Management
 
-Three-tier system:
+**The tool source varies by OS, and that's deliberate.** Debian gets modern CLI
+tools from Mise because apt lags. Arch does not lag, so those tools come from
+pacman and update with `pacman -Syu`. There is intentionally no
+`MISE_PACKAGES_ARCH`.
 
-1. **System Packages** (APT/Homebrew):
-   - Core tools: git, tmux, curl, stow, gnupg
-   - Defined in: `APT_PACKAGES`, `BREW_PACKAGES`, `BREW_CASK_PACKAGES`
+1. **System Packages**:
+   - Debian: `APT_PACKAGES` — core tools only (git, tmux, curl, stow, gnupg)
+   - macOS: `BREW_PACKAGES`, `BREW_CASK_PACKAGES`
+   - Arch: `PACMAN_PACKAGES` — core tools **and** the modern CLI tools
+   - Arch AUR: `AUR_PACKAGES` — only what isn't in the repos
 
-2. **Mise Packages** (platform-specific):
-   - Modern CLI tools: btop, fd, fzf, jq, kubectl, k9s, lazygit, neovim, ripgrep
-   - Defined in: `MISE_PACKAGES_DEBIAN`, `MISE_PACKAGES_MACOS`
+2. **Mise Packages** (Debian only in practice):
+   - `MISE_PACKAGES_DEBIAN`, `MISE_PACKAGES_MACOS` (the macOS list is empty by
+     default; Homebrew handles it)
    - Installed with: `mise use --global PACKAGE@VERSION`
 
-3. **Mise Languages** (runtime environments):
+3. **Mise Languages** (all platforms):
    - Programming languages: Node, Python, Go, Rust, Bun
    - Defined in: `MISE_LANGUAGES` associative array
    - Example: `MISE_LANGUAGES["python"]="python@3.14"`
+
+**Package name drift across managers** is real and worth checking rather than
+assuming — the Scaleway CLI is `scaleway-cli` on pacman and in the Mise
+registry, but `scw` on Homebrew.
+
+**AUR helper** is resolved by `detect_aur_helper` in `_install/env`, preferring
+`paru`, then `yay`, then `shelly`, and building `paru-bin` from the AUR if none
+are installed. `shelly` is CachyOS-only so it can't be the default, but it's
+fully supported and is the one helper that requires repo and AUR packages to be
+requested separately (`shelly install standard` vs `shelly install aur`).
+Override with `AUR_HELPER` in `install-config`. Mixing helpers is safe — they
+all record installed state in pacman's ALPM database.
+
+**The installer never touches `/etc/pacman.conf`.** CachyOS owns it: it defines
+the `cachyos-*-v3` repos most packages come from and needs `[multilib]`
+enabled. Upstream's Arch code disables multilib and appends its own include;
+that behaviour is deliberately not ported.
 
 **Why Mise?** Modern replacement for nvm, pyenv, rbenv, etc. Manages both tools
 and language runtimes.
@@ -269,16 +319,34 @@ Neovim reloads.
    GPG_TTY)
 3. `.config/zsh/.zprofile.local` - User additions (git-ignored)
 4. `.config/zsh/.zshrc` - Interactive shell setup (Oh-My-Zsh, plugins, aliases)
-5. `.config/zsh/.zshrc.local` - User additions (git-ignored)
+5. `.config/zsh/.zshrc.arch` - Arch-only additions, gated on `/etc/arch-release`
+6. `.config/zsh/.zshrc.local` - User additions (git-ignored)
 
 **Oh-My-Zsh Integration**:
 
 - Framework: Oh-My-Zsh
 - Theme: Starship prompt (installed via Mise/Homebrew)
-- Custom plugins (in `~/.local/share/zsh/plugins/`):
+- Custom plugins (in `${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/`):
   - `zsh-autosuggestions` - Fish-like autosuggestions
   - `fast-syntax-highlighting` - Syntax highlighting
+  - `zsh-history-substring-search` - Arrow-key substring history search. **Must
+    load after `fast-syntax-highlighting`**, and it replaces Oh-My-Zsh's default
+    prefix-match binding on ↑/↓.
   - `fzf-tab` - Replace zsh completion with fzf
+- `zoxide` ships with Oh-My-Zsh, so it's just a name in the `plugins=()` array.
+  `cd` is deliberately left alone (no `zoxide init --cmd cd`); use `z` and `zi`.
+
+**`.zshrc.arch`** is a port of the useful parts of CachyOS's
+`cachyos-config.zsh`, not a copy — that file loads Oh-My-Zsh from
+`/usr/share` and sets up p10k, both of which fight this repo's `$HOME`
+Oh-My-Zsh + starship setup. Its `HISTCONTROL` and `PROMPT_COMMAND` lines are
+bash-isms that do nothing under zsh; the zsh equivalents are `setopt
+hist_ignore_all_dups` and Oh-My-Zsh's existing `share_history`.
+
+**`ghq-jump` (CTRL+G)** is a zsh function and ZLE widget in `.zshrc`, not a
+script in `.local/bin/` like `gl`/`gd`/`gbd`. It has to change the shell's
+working directory, which a subprocess cannot do for its parent. Note `^G` is
+`send-break` in zsh's default emacs keymap, so this is a rebind.
 
 **Updating plugins**: `update-omz-plugins` script clones/pulls latest versions.
 
@@ -337,8 +405,9 @@ All use strict Bash mode: `set -o errexit -o pipefail -o nounset`
 - `install` - Orchestrator (sources `_install/` and `install-config`, runs install phases)
 - `install-config.example` - Customization template
 - `install-config` - User overrides (git-ignored, created on first run)
-- `_install/env` - Shared library: helpers, color codes, `detect_env`, `warn_root`
-- `_install/packages/{debian,darwin}` - Default package lists per OS
+- `_install/env` - Shared library: helpers, color codes, `detect_env`,
+  `detect_aur_helper`, `_aur_install`, `warn_root`
+- `_install/packages/{debian,darwin,arch}` - Default package lists per OS
 - `_install/mise_languages` - Default Mise language definitions
 - `_install/symlinks` - Default `_stowit` symlink list
 - `mas.sh` - macOS App Store app installation
@@ -495,6 +564,31 @@ git pull origin main
 - Mise provides newer tool versions
 - X11/Wayland clipboard support via `xclip`
 
+### Arch / CachyOS
+
+- Detected via `ID_LIKE=arch`, normalized to `OS_DISTRO=arch`.
+  `OS_DISTRO_ORIGINAL` still holds the real ID (`cachyos`) if anything needs to
+  tell them apart.
+- pacman supplies the CLI tools directly; there is no Mise tool layer
+- AUR handled by `paru` / `yay` / `shelly` (see Package Management)
+- `/etc/pacman.conf` is never modified — CachyOS owns it
+- Wayland-only clipboard (`wl-clipboard`); `xclip` is not installed here,
+  though `clip-copy`'s X11 fallback still works on other platforms
+- `ttf-cascadia-code-nerd` comes from the repos, so `install_fonts()` skips the
+  download but still runs `fc-cache` — drop paid fonts like MonoLisa into
+  `~/.local/share/fonts` and re-run `./install` to register them
+- `pkgfile` command-not-found suggestions are enabled, with
+  `pkgfile-update.timer` keeping the database fresh
+- **CachyOS ships its own Oh-My-Zsh** at `/usr/share/oh-my-zsh` and exports
+  `ZSH` at it from `/usr/share/cachyos-zsh-config/cachyos-config.zsh`, which
+  `~/.zshrc` sources. `install_omz` therefore pins `ZSH`/`ZSH_CUSTOM` to
+  `${HOME}/.oh-my-zsh` instead of inheriting them — otherwise the OMZ installer
+  aborts with "The $ZSH folder already exists".
+- There is **no global zsh rc** on CachyOS (`/etc/zsh/` holds only `zprofile`),
+  so once `~/.zshenv` sets `ZDOTDIR`, CachyOS's `~/.zshrc` is simply never read
+  and its p10k setup can't conflict with starship. The old file is shadowed,
+  not deleted.
+
 ### WSL 2
 
 - Requires WSLg for clipboard sharing
@@ -513,6 +607,7 @@ ZDOTDIR="${HOME}/.config/zsh"         # Zsh config directory
 XDG_CONFIG_HOME="${HOME}/.config"     # Config directory
 XDG_DATA_HOME="${HOME}/.local/share"  # Data directory
 XDG_CACHE_HOME="${HOME}/.cache"       # Cache directory
+GHQ_ROOT="${HOME}/Workspace"          # Where ghq clones repositories
 GPG_TTY=$(tty)                        # GPG terminal for signing
 ```
 

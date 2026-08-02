@@ -15,6 +15,9 @@ export PATH="${HOME}/.local/bin:${HOME}/.local/bin/local:${PATH}"
 # Confiure Mise (programming language run-time manager).
 export PATH="${XDG_DATA_HOME}/mise/shims:${PATH}"
 
+# Where ghq clones repositories, e.g. ~/Workspace/github.com/owner/repo.
+export GHQ_ROOT="${HOME}/Workspace"
+
 # Configure GPG
 export GNUPGHOME="${XDG_CONFIG_HOME}/gnupg"
 

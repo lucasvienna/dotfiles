@@ -1,9 +1,29 @@
 # Get editor completions based on the config schema
 "$schema" = 'https://starship.rs/config-schema.json'
 
-[aws]
-format = 'on [$symbol($profile )(\($region\) )(\[$duration\] )]($style)'
-symbol = '☁️ '
+# Scaleway has no built-in starship module, so this is a custom command.
+#
+# It parses ~/.config/scw/config.yaml with sed rather than shelling out to
+# `scw`: custom modules run on every prompt, and scw is a Go binary whose
+# startup cost would be paid every time. Environment variables win, matching
+# how the Scaleway CLI resolves its own config.
+#
+# Caveat: the region lookup takes the first default_region in the file. If you
+# ever run profiles in different regions, swap that line for
+#   yq -r ".profiles.\"$profile\".default_region // .default_region" "$cfg"
+[custom.scaleway]
+description = 'Displays the active Scaleway profile and region'
+symbol = '🛰 '
+style = 'bold blue'
+format = 'on [$symbol($output )]($style)'
+when = 'test -n "${SCW_PROFILE:-}" || test -f "${SCW_CONFIG_PATH:-${XDG_CONFIG_HOME:-$HOME/.config}/scw/config.yaml}"'
+command = '''
+cfg="${SCW_CONFIG_PATH:-${XDG_CONFIG_HOME:-$HOME/.config}/scw/config.yaml}"
+profile="${SCW_PROFILE:-$(sed -n 's/^active_profile:[[:space:]]*//p' "$cfg" 2>/dev/null)}"
+region="${SCW_DEFAULT_REGION:-$(sed -n 's/^[[:space:]]*default_region:[[:space:]]*//p' "$cfg" 2>/dev/null | head -1)}"
+[ -n "$profile" ] || profile=default
+if [ -n "$region" ]; then printf '%s (%s)' "$profile" "$region"; else printf '%s' "$profile"; fi
+'''
 
 [dotnet]
 detect_files = ["global.json", "Directory.Build.props", "Directory.Build.targets", "Packages.props"]

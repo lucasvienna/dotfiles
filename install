@@ -88,6 +88,30 @@ _install_packages_debian() {
   sudo apt-get update && sudo apt-get install -y sublime-merge sublime-text
 }
 
+_install_packages_arch() {
+  PACMAN_PACKAGES="$(echo "${PACMAN_PACKAGES}" | xargs)"
+  AUR_PACKAGES="$(echo "${AUR_PACKAGES}" | xargs)"
+
+  if [[ -n "${PACMAN_PACKAGES}" || -n "${PACMAN_PACKAGES_EXTRAS}" ]]; then
+    sudo pacman -Syu --needed --noconfirm ${PACMAN_PACKAGES} ${PACMAN_PACKAGES_EXTRAS}
+  fi
+
+  if [[ -n "${AUR_PACKAGES}" || -n "${AUR_PACKAGES_EXTRAS}" ]]; then
+    echo
+    detect_aur_helper || return 1
+    echo "Using '${AUR_HELPER}' for AUR packages"
+    # shellcheck disable=SC2086
+    _aur_install ${AUR_PACKAGES} ${AUR_PACKAGES_EXTRAS}
+  fi
+
+  # Populate pkgfile's database so command-not-found suggestions work, and keep
+  # it fresh. Purely a convenience, so never fail the install over it.
+  echo
+  sudo pkgfile --update || _warning "pkgfile database sync failed"
+  sudo systemctl enable --now pkgfile-update.timer ||
+    _warning "Could not enable pkgfile-update.timer"
+}
+
 _install_packages_macos() {
   local prefix="/opt/homebrew"
   [[ "${CPU_ARCH}" == "x86_64" ]] && prefix="/usr/local"
@@ -115,42 +139,131 @@ _install_packages_macos() {
 _display_packages_output() {
   local packages="${1:-}"
   local packages_extras="${2:-}"
-  local mise="${3:-}"
-  local mise_extras="${4:-}"
+  local secondary="${3:-}"
+  local secondary_extras="${4:-}"
+  # Debian and macOS pull extra tools from Mise; Arch pulls them from the AUR.
+  local secondary_label="${5:-Mise}"
 
   [ -n "${packages}" ] && printf "\n:: Packages (default)\n%s" "${packages}"
   [ -n "${packages_extras}" ] && printf "\n:: Packages (extras)\n%s" "${packages_extras}"
-  [ -n "${mise}" ] && printf "\n:: Mise (default)\n%s" "${mise}"
-  [ -n "${mise_extras}" ] && printf "\n:: Mise (extras)\n%s" "${mise_extras}"
+  [ -n "${secondary}" ] && printf "\n:: %s (default)\n%s" "${secondary_label}" "${secondary}"
+  [ -n "${secondary_extras}" ] && printf "\n:: %s (extras)\n%s" "${secondary_label}" "${secondary_extras}"
+
+  # The tests above are the last statements, so an empty extras list would
+  # otherwise make this function return 1.
+  return 0
 }
 
 _display_packages() {
-  if [ "${OS_TYPE}" == "linux" ]; then
+  case "${OS_DISTRO}" in
+  debian)
     _display_packages_output \
       "${APT_PACKAGES}" "${APT_PACKAGES_EXTRAS}" \
       "${MISE_PACKAGES_DEBIAN}" "${MISE_PACKAGES_DEBIAN_EXTRAS}"
-  else
+    ;;
+  arch)
+    _display_packages_output \
+      "${PACMAN_PACKAGES}" "${PACMAN_PACKAGES_EXTRAS}" \
+      "${AUR_PACKAGES}" "${AUR_PACKAGES_EXTRAS}" "AUR"
+    ;;
+  darwin)
     [ -n "${BREW_CASK_PACKAGES}" ] && BREW_PACKAGES+="${BREW_CASK_PACKAGES}"
     [ -n "${BREW_CASK_PACKAGES_EXTRAS}" ] && BREW_PACKAGES_EXTRAS+="${BREW_CASK_PACKAGES_EXTRAS}"
 
     _display_packages_output \
       "${BREW_PACKAGES}" "${BREW_PACKAGES_EXTRAS}" \
       "${MISE_PACKAGES_MACOS}" "${MISE_PACKAGES_MACOS_EXTRAS}"
-  fi
+    ;;
+  esac
+}
+
+# stow refuses to replace a real file, and it's normal for a config we ship to
+# already exist — CachyOS ships an alacritty.toml, a distro may ship a .zshrc.
+# Move those aside so stow has a clear path. Backups are never overwritten, and
+# nothing is deleted, so this needs no prompt.
+#
+# Note this walks the whole package rather than asking stow what it would
+# conflict on, so a file stow would have ignored can also get backed up. That
+# only ever leaves a spare .bak behind.
+_backup_stow_conflicts() {
+  local dir="${1}"
+  local target="${2}"
+  local package="${3}"
+  local source_root="${dir}/${package}"
+  local relative dest backup resolved n
+  local source_real=
+
+  [ -d "${source_root}" ] || return 0
+
+  source_real="$(cd "${source_root}" && pwd -P)" || return 0
+
+  while IFS= read -r -d '' relative; do
+    relative="${relative#"${source_root}/"}"
+    dest="${target}/${relative}"
+
+    # Only real files block stow; its own symlinks are replaced happily.
+    [[ -e "${dest}" && ! -L "${dest}" ]] || continue
+
+    # stow folds trees: it links a whole directory when it can, so
+    # ~/.config/nvim/lua is a symlink into the package. Files beneath it are
+    # not symlinks themselves, yet they resolve back into the repo -- moving
+    # one would rename the repo's own file rather than back anything up.
+    resolved="$(readlink -f "${dest}" 2>/dev/null || true)"
+
+    if [ -n "${resolved}" ]; then
+      case "${resolved}" in
+      "${source_real}/"*) continue ;;
+      esac
+    fi
+
+    backup="${dest}.bak"
+    n=1
+    while [ -e "${backup}" ]; do
+      backup="${dest}.bak.${n}"
+      n=$((n + 1))
+    done
+
+    mv "${dest}" "${backup}"
+    printf "  kept your existing %s as %s\n" "${relative}" "$(basename "${backup}")"
+  done < <(find "${source_root}" -type f -print0)
 }
 
 _stowit() {
   local package="${*: -1}"
-  local stow_flags="--restow --ignore='(theme\.(sh|theme|ron|conf|lua)|theme|claude)'"
+  # An array, not a string: word-splitting a quoted string passed the literal
+  # single quotes through to stow, so the ignore regex never matched and
+  # theme.* files (absolute symlinks made by set_theme) broke every stow that
+  # couldn't fold its tree.
+  local stow_flags=(--restow "--ignore=(theme\.(sh|theme|ron|conf|lua|toml)|theme|claude)")
   local stow_output
   local stow_exit=0
+  local stow_args=("${@}")
+  local stow_dir=
+  local stow_target=
+  local i
+
+  for ((i = 0; i < ${#stow_args[@]}; i++)); do
+    case "${stow_args[i]}" in
+    -d) stow_dir="${stow_args[i + 1]}" ;;
+    -t) stow_target="${stow_args[i + 1]}" ;;
+    esac
+  done
+
+  # stow errors out if --target doesn't exist. Create it here rather than
+  # relying on create_initial_dirs listing every target, which silently drifts
+  # out of sync whenever a package is added to _install/symlinks.
+  [ -n "${stow_target}" ] && mkdir -p "${stow_target}"
+
+  if [[ -n "${stow_dir}" && -n "${stow_target}" ]]; then
+    _backup_stow_conflicts "${stow_dir}" "${stow_target}" "${package}"
+  fi
 
   if [ -n "${DEBUG:-}" ]; then
-    stow_flags+=" --verbose"
-    stow_output=$(stow ${stow_flags} "$@" 2>&1) || stow_exit=$?
+    stow_flags+=(--verbose)
+    stow_output=$(stow "${stow_flags[@]}" "$@" 2>&1) || stow_exit=$?
     echo "$stow_output" | grep -v "BUG in find_stowed_path" || true
   else
-    stow_output=$(stow ${stow_flags} "$@" 2>&1) || stow_exit=$?
+    stow_output=$(stow "${stow_flags[@]}" "$@" 2>&1) || stow_exit=$?
   fi
 
   if [ ${stow_exit} -ne 0 ]; then
@@ -190,12 +303,17 @@ EOF
   debian)
     su -c "apt-get update && apt-get install -y ${missing_packages[*]}"
     ;;
+  arch)
+    su -c "pacman -Syu --needed --noconfirm ${missing_packages[*]}"
+    ;;
   esac
 }
 
 create_initial_dirs() {
   mkdir -p \
     "${HOME}/.cache/zsh" \
+    "${HOME}/.config/alacritty" \
+    "${HOME}/.config/bottom" \
     "${HOME}/.config/btop/themes" \
     "${HOME}/.config/fzf" \
     "${HOME}/.config/gh" \
@@ -207,7 +325,15 @@ create_initial_dirs() {
     "${HOME}/.config/tmux/plugins" \
     "${HOME}/.config/zsh" \
     "${HOME}/.local/bin" \
-    "${HOME}/.local/share/fonts"
+    "${HOME}/.local/share/fonts" \
+    "${XDG_DATA_HOME:-${HOME}/.local/share}/zsh/custom/plugins" \
+    "${GHQ_ROOT:-${HOME}/Workspace}"
+
+  # alacritty.toml imports this unconditionally, so it has to exist even on a
+  # fresh clone. Git-ignored: it's where per-machine font and title live.
+  [ -f "${HOME}/.config/alacritty/local.toml" ] ||
+    printf "# Machine-specific alacritty overrides (not tracked by git).\n" \
+      >"${HOME}/.config/alacritty/local.toml"
 }
 
 install_packages() {
@@ -241,11 +367,11 @@ EOF
     [ -n "${YYES}" ] && yn=y
     case "${yn}" in
     [Yy]*)
-      if [ "${OS_TYPE}" == "linux" ]; then
-        _install_packages_debian
-      else
-        _install_packages_macos
-      fi
+      case "${OS_DISTRO}" in
+      debian) _install_packages_debian ;;
+      arch) _install_packages_arch ;;
+      darwin) _install_packages_macos ;;
+      esac
       break
       ;;
     [Nn]*) exit ;;
@@ -334,6 +460,15 @@ install_fonts() {
     font_path="${macos_font_path}"
   fi
 
+  # Arch ships ttf-cascadia-code-nerd, which is in PACMAN_PACKAGES, so there's
+  # nothing to download. Still refresh the cache: manually installed fonts
+  # (MonoLisa and friends) dropped into the font path get picked up here.
+  if [ "${OS_DISTRO}" = "arch" ]; then
+    _skipping "Nerd Font comes from ttf-cascadia-code-nerd on Arch"
+    fc-cache -f
+    return
+  fi
+
   if [ -f "${font_path}/${font_filename}" ]; then
     _skipping "Fonts are already installed at '${font_path}'"
     return
@@ -374,7 +509,26 @@ install_omz() {
   _info "INSTALL OH-MY-ZSH"
 
   local install_tmp="/tmp/omz_install.sh"
+  local system_omz="/usr/share/oh-my-zsh"
   export omz_path="${HOME}/.oh-my-zsh"
+
+  # Custom plugins always live under XDG_DATA_HOME, never inside $ZSH — a
+  # packaged $ZSH is root-owned, and this keeps plugins out of harm's way even
+  # when OMZ is reinstalled. Must match what .zshrc exports.
+  export ZSH_CUSTOM="${XDG_DATA_HOME:-${HOME}/.local/share}/zsh/custom"
+
+  # Distros that package Oh-My-Zsh win — CachyOS ships oh-my-zsh-git at
+  # /usr/share/oh-my-zsh, which pacman keeps updated. No second copy needed.
+  if [ -d "${system_omz}" ]; then
+    _skipping "Using the system Oh-My-Zsh at '${system_omz}'"
+    export ZSH="${system_omz}"
+    return 0
+  fi
+
+  # Pin ZSH rather than inheriting it. CachyOS exports ZSH at its own copy from
+  # cachyos-config.zsh, and the OMZ installer aborts when $ZSH is an existing
+  # directory — so an inherited value would break the fallback path too.
+  export ZSH="${omz_path}"
 
   if [ -f "${omz_path}/tools/upgrade.sh" ]; then
     echo "Already installed, updating"
@@ -769,10 +923,17 @@ configure_git() {
   format = ssh
 EOF
 
-    if [ "${OS_TYPE}" == "linux" ]; then
+    # 1Password's SSH signing helper lives somewhere different on each platform.
+    # WSL shells out to the Windows binary; native Linux gets the deb/AUR path.
+    if [ "${OS_IN_WSL}" == "1" ]; then
       cat <<EOF >>"${git_config_local_path}"
 [gpg "ssh"]
   program = "/mnt/c/Users/LVI/AppData/Local/Microsoft/WindowsApps/op-ssh-sign-wsl.exe"
+EOF
+    elif [ "${OS_TYPE}" == "linux" ]; then
+      cat <<EOF >>"${git_config_local_path}"
+[gpg "ssh"]
+  program = "/opt/1Password/op-ssh-sign"
 EOF
     else
       cat <<EOF >>"${git_config_local_path}"
@@ -822,8 +983,19 @@ install_tmux_plugins() {
   rm -rf "${tpm_path}"
   git clone --depth 1 https://github.com/tmux-plugins/tpm "${tpm_path}"
 
+  # Not a TPM @plugin — the theme files reference it by path — so it's cloned
+  # here. Pull on re-runs instead of failing on an existing directory.
+  local catppuccin_path="${TMUX_PLUGIN_MANAGER_PATH}/catppuccin/tmux"
+
   mkdir -p "${TMUX_PLUGIN_MANAGER_PATH}/catppuccin"
-  git clone https://github.com/catppuccin/tmux.git "${TMUX_PLUGIN_MANAGER_PATH}/catppuccin/tmux"
+
+  if [ -d "${catppuccin_path}/.git" ]; then
+    echo "Updating catppuccin/tmux..."
+    git -C "${catppuccin_path}" pull --ff-only
+  else
+    rm -rf "${catppuccin_path}"
+    git clone https://github.com/catppuccin/tmux.git "${catppuccin_path}"
+  fi
 
   "${tpm_path}/bin/install_plugins"
 }
@@ -867,12 +1039,21 @@ set_theme() {
 
   [ -z "${OS_DISTRO:-}" ] && detect_env
 
+  ln -fns "${DOTFILES_PATH}/themes/${theme}/alacritty.toml" "${HOME}/.config/alacritty/theme.toml"
   ln -fns "${DOTFILES_PATH}/themes/${theme}/btop.theme" "${HOME}/.config/btop/themes/theme.theme"
   ln -fns "${DOTFILES_PATH}/themes/${theme}/fzf.sh" "${HOME}/.config/fzf/theme.sh"
   ln -fns "${DOTFILES_PATH}/themes/${theme}/ghostty" "${HOME}/.config/ghostty/theme"
   ln -fns "${DOTFILES_PATH}/themes/${theme}/gitui.ron" "${HOME}/.config/gitui/theme.ron"
   ln -fns "${DOTFILES_PATH}/themes/${theme}/nvim.lua" "${HOME}/.config/nvim/lua/plugins/theme.lua"
   ln -fns "${DOTFILES_PATH}/themes/${theme}/tmux.conf" "${HOME}/.config/tmux/theme.conf"
+
+  # bottom is the one exception to the symlink model: it has no config import
+  # mechanism, so shared settings and per-theme styles are concatenated into a
+  # generated file. The two halves declare disjoint tables, so this is valid
+  # TOML.
+  cat "${DOTFILES_PATH}/.config/bottom/base.toml" \
+    "${DOTFILES_PATH}/themes/${theme}/bottom-styles.toml" \
+    >"${HOME}/.config/bottom/bottom.toml"
 
   echo "'${theme}' is your active theme"
 
@@ -887,11 +1068,17 @@ set_theme() {
 
     [ -e "${WT_PATH}" ] && sed -i "${SED_EXPR}" "${WT_PATH}"
   else
-    killall -SIGUSR2 ghostty 2>/dev/null || true
+    pkill -USR2 -x ghostty 2>/dev/null || true
   fi
 
-  killall -SIGUSR2 btop 2>/dev/null || true
+  pkill -USR2 -x btop 2>/dev/null || true
   tmux source-file "${HOME}/.config/tmux/tmux.conf" 2>/dev/null || true
+
+  # alacritty repaints on its own via live_config_reload. bottom has no reload
+  # mechanism at all, so say so rather than silently doing nothing.
+  if pgrep -x btm >/dev/null 2>&1; then
+    echo "Restart 'btm' to pick up the new theme"
+  fi
 }
 
 healthcheck() {
@@ -1151,6 +1338,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   debian)
     # shellcheck disable=SC1091
     source "${DOTFILES_PATH}/_install/packages/debian"
+    ;;
+  arch)
+    # shellcheck disable=SC1091
+    source "${DOTFILES_PATH}/_install/packages/arch"
     ;;
   darwin)
     # shellcheck disable=SC1091

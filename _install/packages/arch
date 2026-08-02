@@ -1,0 +1,85 @@
+# shellcheck shell=bash
+# Default Arch / CachyOS / EndeavourOS packages.
+#
+# Override or extend any of these in install-config (use *_EXTRAS to append,
+# or set the base var to overwrite). To skip an entire group, set it to a
+# single quoted space, e.g. PACMAN_PACKAGES=" ".
+#
+# Unlike Debian there's no Mise tool list here. Apt lags, so Debian pulls modern
+# CLI tools from Mise; pacman doesn't lag, so those tools come from the repos
+# and update with `pacman -Syu`. Mise is left to language runtimes, which
+# _install/mise_languages handles for every OS.
+
+PACMAN_PACKAGES="${PACMAN_PACKAGES:-
+  alacritty
+  aspell
+  base-devel
+  bc
+  bind
+  bottom
+  btop
+  coreutils
+  curl
+  expac
+  fastfetch
+  fd
+  findutils
+  fontconfig
+  fzf
+  ghostty
+  ghq
+  git
+  git-delta
+  github-cli
+  gitui
+  gnupg
+  helm
+  inotify-tools
+  iproute2
+  jq
+  k9s
+  kubectl
+  lazygit
+  man-db
+  mise
+  neovim
+  openbsd-netcat
+  openssh
+  opentofu
+  pinentry
+  pkgfile
+  procps-ng
+  pwgen
+  ripgrep
+  rsync
+  scaleway-cli
+  shellcheck
+  shfmt
+  starship
+  stow
+  sudo
+  terraform
+  the_silver_searcher
+  tmux
+  ttf-cascadia-code-nerd
+  unzip
+  which
+  whois
+  wl-clipboard
+  xz
+  yq
+  zip
+  zoxide
+  zsh
+}
+"
+PACMAN_PACKAGES_EXTRAS="${PACMAN_PACKAGES_EXTRAS:-}"
+
+# Installed with the helper resolved by detect_aur_helper (paru, yay or shelly).
+AUR_PACKAGES="${AUR_PACKAGES:-
+  1password-cli
+  sublime-merge
+  terramate
+}
+"
+AUR_PACKAGES_EXTRAS="${AUR_PACKAGES_EXTRAS:-}"

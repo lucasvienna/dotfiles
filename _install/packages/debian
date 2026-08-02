@@ -43,10 +43,11 @@ APT_PACKAGES_EXTRAS="${APT_PACKAGES_EXTRAS:-}"
 # lag, so we prefer Mise here. macOS gets these from Homebrew instead.
 MISE_PACKAGES_DEBIAN="${MISE_PACKAGES_DEBIAN:-
   1password
-  aws-cli
   btop
   fd
   fzf
+  gh
+  ghq
   jq
   helm
   kubectl
@@ -54,12 +55,14 @@ MISE_PACKAGES_DEBIAN="${MISE_PACKAGES_DEBIAN:-
   lazygit
   neovim
   ripgrep
+  scaleway-cli
   shellcheck
   shfmt
   starship
   terraform
   terramate
   yq
+  zoxide
 }
 "
 MISE_PACKAGES_DEBIAN_EXTRAS="${MISE_PACKAGES_DEBIAN_EXTRAS:-}"

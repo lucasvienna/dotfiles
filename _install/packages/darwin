@@ -7,7 +7,6 @@
 
 BREW_PACKAGES="${BREW_PACKAGES:-
   aspell
-  awscli
   bash
   bat
   bc
@@ -20,6 +19,7 @@ BREW_PACKAGES="${BREW_PACKAGES:-
   findutils
   fzf
   gh
+  ghq
   git
   git-delta
   gnupg
@@ -38,6 +38,7 @@ BREW_PACKAGES="${BREW_PACKAGES:-
   ripgrep
   rsync
   rustup
+  scw
   shellcheck
   shfmt
   stow
@@ -53,6 +54,7 @@ BREW_PACKAGES="${BREW_PACKAGES:-
   wget
   xz
   yq
+  zoxide
 }
 "
 BREW_PACKAGES_EXTRAS="${BREW_PACKAGES_EXTRAS:-}"

@@ -1,0 +1,71 @@
+# shellcheck shell=bash
+# Arch-only shell config. Sourced from .zshrc when /etc/arch-release exists,
+# before .zshrc.local so your local overrides still win.
+#
+# This is a port of the useful parts of CachyOS's /usr/share/cachyos-zsh-config,
+# not a copy of it. That file loads Oh-My-Zsh from /usr/share and sets up p10k,
+# both of which would fight this repo's $HOME Oh-My-Zsh + starship setup. It
+# also carries two bash-isms that do nothing under zsh:
+#
+#   HISTCONTROL=ignoreboth   -> bash only; the zsh equivalent is setopt below
+#   PROMPT_COMMAND=...       -> bash only; OMZ already sets share_history
+#
+# -----------------------------------------------------------------------------
+# History
+# -----------------------------------------------------------------------------
+# OMZ's lib/history.zsh already gives us extended_history, hist_expire_dups_first,
+# hist_ignore_dups, hist_ignore_space, hist_verify and share_history. These two
+# are the additions that actually do something.
+
+setopt hist_ignore_all_dups
+
+HISTORY_IGNORE="(bg|fg|c|cd|clear|exit|history|jobs|l|ll|ls|pwd|reset|z)(| *)"
+
+# -----------------------------------------------------------------------------
+# Pacman / AUR
+# -----------------------------------------------------------------------------
+
+alias rmpkg="sudo pacman -Rsn"
+alias cleanch="sudo pacman -Scc"
+alias fixpacman="sudo rm -f /var/lib/pacman/db.lck"
+alias jctl="journalctl -p 3 -xb"
+alias rip="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -200 | nl"
+
+# `update` and orphan removal go through shelly when it's around, since that's
+# the CachyOS-native front end. Everything else stays plain pacman so it works
+# on any Arch box.
+if command -v shelly >/dev/null 2>&1; then
+  alias update="shelly upgrade"
+  alias rmorphans="shelly purify"
+else
+  alias update="sudo pacman -Syu"
+
+  # Named rmorphans, not cleanup: cleanup is already the .DS_Store sweep in
+  # .aliases. Guarded because `pacman -Rsn $(pacman -Qtdq)` — the CachyOS
+  # original — errors out when there's nothing to remove.
+  rmorphans() {
+    local orphans
+    orphans="$(pacman -Qtdq)" || {
+      echo "No orphaned packages."
+      return 0
+    }
+
+    # shellcheck disable=SC2086
+    sudo pacman -Rsn ${=orphans}
+  }
+fi
+
+# Suggest the package providing an unknown command. The database is populated by
+# ./install via `pkgfile --update` + pkgfile-update.timer.
+[ -f /usr/share/doc/pkgfile/command-not-found.zsh ] &&
+  . /usr/share/doc/pkgfile/command-not-found.zsh
+
+# -----------------------------------------------------------------------------
+# Builds
+# -----------------------------------------------------------------------------
+# Single-quoted so $(nproc) is evaluated when the alias runs, not when it's
+# defined — matters if you ever run under a restricted cpuset.
+
+alias make='make -j$(nproc)'
+alias ninja='ninja -j$(nproc)'
+alias n="ninja"
