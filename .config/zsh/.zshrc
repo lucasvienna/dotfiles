@@ -6,7 +6,7 @@
 # environment.
 # shellcheck disable=SC1091
 if [[ -z "${DOTFILES_ZPROFILE_SOURCED:-}" && -f "${ZDOTDIR:-${HOME}/.config/zsh}/.zprofile" ]]; then
-  . "${ZDOTDIR:-${HOME}/.config/zsh}/.zprofile"
+	. "${ZDOTDIR:-${HOME}/.config/zsh}/.zprofile"
 fi
 
 # Put programs on `/etc/paths.d/` in the PATH
@@ -17,9 +17,9 @@ fi
 # second copy in $HOME. Nothing packages it on Debian or macOS, so those fall
 # back to the $HOME install that ./install performs.
 if [ -d /usr/share/oh-my-zsh ]; then
-  export ZSH="/usr/share/oh-my-zsh"
+	export ZSH="/usr/share/oh-my-zsh"
 else
-  export ZSH="${HOME}/.oh-my-zsh"
+	export ZSH="${HOME}/.oh-my-zsh"
 fi
 
 # Custom plugins deliberately live outside $ZSH: a packaged $ZSH is root-owned,
@@ -32,9 +32,9 @@ export ZSH_CUSTOM="${XDG_DATA_HOME:-${HOME}/.local/share}/zsh/custom"
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
-  ZSH_THEME=""
+	ZSH_THEME=""
 else
-  ZSH_THEME="robbyrussell"
+	ZSH_THEME="robbyrussell"
 fi
 
 # Uncomment the following line to disable bi-weekly auto-update checks.
@@ -49,22 +49,22 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-  brew
-  git
-  rust
-  kubectl
-  helm
-  k9s
-  terraform
-  opentofu
-  sublime-merge
-  zoxide
-  fzf-tab
-  zsh-autosuggestions
-  fast-syntax-highlighting
-  # Must come after fast-syntax-highlighting, per its README.
-  zsh-history-substring-search
-  starship
+	brew
+	git
+	rust
+	kubectl
+	helm
+	k9s
+	terraform
+	opentofu
+	sublime-merge
+	zoxide
+	fzf-tab
+	zsh-autosuggestions
+	fast-syntax-highlighting
+	# Must come after fast-syntax-highlighting, per its README.
+	zsh-history-substring-search
+	starship
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -78,9 +78,9 @@ export GPG_TTY=$(tty)
 
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
+	export EDITOR='vim'
 else
-  export EDITOR='nvim'
+	export EDITOR='nvim'
 fi
 
 # Enable mise automatic activation
@@ -112,14 +112,21 @@ bindkey '^[[B' history-substring-search-down
 # in .local/bin (like gl/gd/gbd) because it changes the shell's directory,
 # which a subprocess can't do for its parent.
 ghq-jump() {
-  local dir
-  dir="$(ghq list --full-path | fzf --prompt='repo> ' --preview 'ls -la {}')" || return
-  [ -n "${dir}" ] && cd "${dir}"
+	local dir
+	dir="$(ghq list --full-path | fzf --height 40% --prompt='repo> ' --preview 'ls -la {}')" || return
+	[ -n "${dir}" ] && cd "${dir}"
 }
 
 ghq-jump-widget() {
-  ghq-jump
-  zle reset-prompt
+	emulate -L zsh
+	ghq-jump
+	local ret=$?
+	local precmd
+	for precmd in $precmd_functions; do
+		$precmd
+	done
+	zle reset-prompt
+	return $ret
 }
 
 zle -N ghq-jump-widget
@@ -129,7 +136,7 @@ bindkey '^G' ghq-jump-widget
 # Loaded before the .local files so those still get the last word.
 # shellcheck disable=SC1091
 [ -f /etc/arch-release ] && [ -f "${XDG_CONFIG_HOME}/zsh/.zshrc.arch" ] &&
-  . "${XDG_CONFIG_HOME}/zsh/.zshrc.arch"
+	. "${XDG_CONFIG_HOME}/zsh/.zshrc.arch"
 
 # Load local settings if they exist.
 [ -f "${XDG_CONFIG_HOME}/zsh/.zshrc.local" ] && . "${XDG_CONFIG_HOME}/zsh/.zshrc.local"

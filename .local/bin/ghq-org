@@ -1,0 +1,19 @@
+#!/usr/bin/env zsh
+
+ghq-org() {
+	emulate -L zsh
+	if (($# == 0)); then
+		print -u2 "usage: ghq-org <org|user> [gh repo list flags…]"
+		return 1
+	fi
+	local org=$1
+	shift
+	gh repo list "$org" --limit 1000 --no-archived "$@" \
+		--json nameWithOwner --jq '.[].nameWithOwner' |
+		xargs -P 8 -I{} ghq get -u -p {}
+}
+
+ghq-sync() {
+	emulate -L zsh
+	ghq list --full-path | xargs -P 8 -I{} git -C {} pull --ff-only
+}
