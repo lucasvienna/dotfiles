@@ -17,6 +17,7 @@ return {
         "markdown",
         "mdx",
         "scss",
+        "svelte",
         "toml",
         "yaml",
       }

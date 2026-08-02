@@ -12,6 +12,7 @@ return {
         "csv",
         "ini",
         "nginx",
+        "ghostty",
       },
     },
   },

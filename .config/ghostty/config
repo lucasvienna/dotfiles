@@ -1,6 +1,7 @@
+font-family = MonoLisaCode
 font-family = MonoLisa Variable
 font-family = CaskaydiaCove Nerd Font Mono
-font-size = 14
+font-size = 13
 font-feature = -calt, -liga, -dlig
 
 adjust-cursor-thickness = 3
