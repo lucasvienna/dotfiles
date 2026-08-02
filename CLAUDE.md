@@ -158,6 +158,14 @@ for user customization:
 - `.config/zsh/.zprofile.local`
 - `.config/zsh/.aliases.local`
 - `.config/git/config.local`
+- `.config/ghostty/config.local`
+- `.config/alacritty/local.toml`
+
+**These live in the repo, not in `$HOME`.** They're git-ignored but stowed like
+every other config, so `~/.config/zsh/.zshrc.local` is a symlink back into
+`${DOTFILES_PATH}` and can be edited centrally alongside everything else.
+`_ensure_local_file` creates them in the repo, and migrates any real file left
+in `$HOME` by an older version of the installer instead of overwriting it.
 
 Main configs source these `.local` files, allowing customization without
 modifying tracked files.

@@ -228,6 +228,28 @@ _backup_stow_conflicts() {
   done < <(find "${source_root}" -type f -print0)
 }
 
+# Make sure a git-ignored override file lives in the repo, so it's editable
+# centrally and stow can symlink it into place like everything else.
+#
+# Earlier versions wrote some of these straight into ${HOME}, which left them
+# as real files outside the repo -- and stow then refused to replace them. Any
+# such file is moved in rather than overwritten, so its contents survive.
+_ensure_local_file() {
+  local repo_path="${1}"
+  local home_path="${2}"
+  local default_content="${3}"
+
+  if [[ ! -e "${repo_path}" && -f "${home_path}" && ! -L "${home_path}" ]]; then
+    mv "${home_path}" "${repo_path}"
+    printf "  moved %s into the repo so it can be edited centrally\n" "${home_path/${HOME}/\~}"
+    return 0
+  fi
+
+  [ -e "${repo_path}" ] && return 0
+
+  printf "%s" "${default_content}" >"${repo_path}"
+}
+
 _stowit() {
   local package="${*: -1}"
   # An array, not a string: word-splitting a quoted string passed the literal
@@ -330,10 +352,13 @@ create_initial_dirs() {
     "${GHQ_ROOT:-${HOME}/Workspace}"
 
   # alacritty.toml imports this unconditionally, so it has to exist even on a
-  # fresh clone. Git-ignored: it's where per-machine font and title live.
-  [ -f "${HOME}/.config/alacritty/local.toml" ] ||
-    printf "# Machine-specific alacritty overrides (not tracked by git).\n" \
-      >"${HOME}/.config/alacritty/local.toml"
+  # fresh clone. Lives in the repo (git-ignored) and is stowed like everything
+  # else, so per-machine font and title stay centrally editable.
+  _ensure_local_file \
+    "${DOTFILES_PATH}/.config/alacritty/local.toml" \
+    "${HOME}/.config/alacritty/local.toml" \
+    "# Machine-specific alacritty overrides (not tracked by git).
+"
 }
 
 install_packages() {
@@ -633,11 +658,15 @@ configure_system_configs() {
 configure_home_configs() {
   _info "CONFIGURE HOME CONFIGS"
 
-  local ghostty_config="${HOME}/.config/ghostty/config.local"
+  _ensure_local_file \
+    "${DOTFILES_PATH}/.config/ghostty/config.local" \
+    "${HOME}/.config/ghostty/config.local" \
+    "# Add your custom overrides here, such as fonts, etc..
+"
 
-  if [ ! -f "${ghostty_config}" ]; then
-    printf "# Add your custom overrides here, such as fonts, etc..\n" >"${ghostty_config}"
-  fi
+  # This phase runs after create_symlinks, so link the file we may have just
+  # created rather than making the user re-run.
+  _stowit -d "${DOTFILES_PATH}/.config" -t "${HOME}/.config/ghostty" ghostty
 
   echo "Everything that required updating was updated"
 }
@@ -649,11 +678,13 @@ configure_shell() {
   local original_dotfiles_path="${DOTFILES_PATH}"
 
   for file in "${local_files[@]}"; do
-    local file_path="${HOME}/.config/zsh/${file}"
+    _ensure_local_file \
+      "${DOTFILES_PATH}/.config/zsh/${file}" \
+      "${HOME}/.config/zsh/${file}" \
+      "# shellcheck shell=bash
 
-    if [ ! -f "${file_path}" ]; then
-      printf "# shellcheck shell=bash\n\n# Any settings defined here are gitignored.\n" >"${file_path}"
-    fi
+# Any settings defined here are gitignored.
+"
   done
 
   local zprofile_path="${DOTFILES_PATH}/.config/zsh/.zprofile.local"
