@@ -1031,7 +1031,19 @@ set_theme() {
   fi
 
   if [ ! -d "${DOTFILES_PATH}/themes/${theme}" ]; then
-    echo "Theme '${theme}' not found, aborting!" >&2
+    if [ -d "${DOTFILES_PATH}/_themes/${theme}" ]; then
+      cat <<EOF >&2
+
+Theme '${theme}' hasn't been fetched yet. Its colours are licensed, so they
+aren't committed to this repo -- render them from the templates with:
+
+    dot-theme-fetch ${theme}
+
+EOF
+    else
+      echo "Theme '${theme}' not found, aborting!" >&2
+    fi
+
     return 1
   fi
 

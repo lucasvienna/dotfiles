@@ -239,6 +239,34 @@ to be restarted, which `set_theme()` warns about when one is running.
 3. Adjust color values in each file
 4. Switch with `dot-theme-set NEW_THEME_NAME`
 
+**Licensed themes** (`_themes/` + `dot-theme-fetch`):
+
+Dracula PRO is paid, and this repo is public, so its colours can't be committed.
+`themes/dracula-pro/` is git-ignored; `_themes/dracula-pro/` holds templates
+carrying structure with `{{PlaceholderName}}` tokens instead of hex values.
+`dot-theme-fetch` renders them:
+
+- Colours come from the private `dracula-pro/palette` repo, read with `gh`.
+  Two sources are merged because neither is complete: `variants/<variant>.yml`
+  supplies the semantic and `AnsiColorN` anchors, and the `## Pro` section of
+  `terminal-standard/palette.md` adds the `Bright*`/`Dim*` names. The YAML is
+  emitted first so it wins on overlap.
+- Rendering is a generated `sed` script (`s|{{Name}}|#HEX|g` per colour). Any
+  placeholder left unresolved afterwards is a hard error, so a moved palette
+  fails loudly instead of shipping a broken theme.
+- `alacritty.toml` and the ghostty theme are fetched **verbatim** from the org
+  rather than templated — the official files define search, hints, footer and
+  dim colours that a template derived from our configs wouldn't have. The
+  ghostty one lands in `~/.config/ghostty/themes/` because that's where
+  `theme = dracula-pro` is resolved, not in the repo.
+- `set_theme` detects a theme that has templates but no rendered output and
+  points at `dot-theme-fetch` rather than just failing.
+
+Note `_themes/dracula-pro/tmux.conf` is byte-identical to the tokyonight-moon
+one — a copy/paste leftover, so the Dracula theme currently renders tmux in
+tokyonight blues. It contains no licensed colours, which is why it needs no
+templating, but it is a bug worth fixing.
+
 ### Package Management
 
 **The tool source varies by OS, and that's deliberate.** Debian gets modern CLI
@@ -389,6 +417,7 @@ Located in `.config/git/`:
 | Script                     | Purpose                                      |
 | -------------------------- | -------------------------------------------- |
 | `dot-theme-set`            | Switch system-wide theme                     |
+| `dot-theme-fetch`          | Render licensed themes from `_themes/` templates |
 | `update-omz-plugins`       | Update Oh-My-Zsh custom plugins              |
 | `clip-copy` / `clip-paste` | Cross-platform clipboard (Wayland/macOS/X11) |
 | `mkscript`                 | Create executable script with proper shebang |

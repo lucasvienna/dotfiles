@@ -1,0 +1,152 @@
+#!/usr/bin/env bash
+# Fetch a licensed theme whose colours can't be committed to this repo.
+#
+# Dracula PRO is paid, so themes/dracula-pro/ is git-ignored. This renders it on
+# demand from the templates in _themes/<theme>/ (structure only, no colours)
+# plus the palette published in the private dracula-pro GitHub org. Files the
+# org ships directly -- alacritty, ghostty -- are fetched verbatim instead of
+# templated, since they carry more detail than a template would.
+#
+# Requires membership of the org and an authenticated `gh`.
+#
+# Usage:
+#   dot-theme-fetch                      # dracula-pro, "pro" variant
+#   dot-theme-fetch dracula-pro          # same
+#   dot-theme-fetch dracula-pro blade    # a different Dracula PRO variant
+#   dot-theme-fetch --list               # what can be fetched
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+PALETTE_REPO="dracula-pro/palette"
+
+if [ -z "${DOTFILES_PATH:-}" ]; then
+  cat <<EOF >&2
+DOTFILES_PATH isn't set. Open a new shell after running ./install, or:
+
+    DOTFILES_PATH="\${HOME}/dotfiles" ${0##*/} ${*}
+
+EOF
+  exit 1
+fi
+
+templates_root="${DOTFILES_PATH}/_themes"
+
+if [ "${1:-}" = "--list" ]; then
+  find "${templates_root}" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort
+  exit
+fi
+
+THEME="${1:-dracula-pro}"
+VARIANT="${2:-pro}"
+
+templates_path="${templates_root}/${THEME}"
+output_path="${DOTFILES_PATH}/themes/${THEME}"
+
+if [ ! -d "${templates_path}" ]; then
+  echo "No templates for '${THEME}' in ${templates_root}" >&2
+  echo "Run '${0##*/} --list' to see what can be fetched." >&2
+  exit 1
+fi
+
+if ! command -v gh >/dev/null 2>&1; then
+  echo "The GitHub CLI is needed to read the private palette repo." >&2
+  echo "Install 'gh' (or 'github-cli' on Arch), then run 'gh auth login'." >&2
+  exit 1
+fi
+
+if ! gh api "repos/${PALETTE_REPO}" >/dev/null 2>&1; then
+  cat <<EOF >&2
+Can't read ${PALETTE_REPO}.
+
+This theme is paid, so its colours live in a private org rather than in this
+repo. You need to be a member of the dracula-pro org and authenticated:
+
+    gh auth login
+    gh api repos/${PALETTE_REPO}
+
+EOF
+  exit 1
+fi
+
+# Fetch a file from a private repo and write it to stdout.
+_fetch() {
+  gh api "repos/${1}/contents/${2}" --jq ".content" | base64 --decode
+}
+
+echo "Fetching the ${THEME} (${VARIANT}) palette..."
+
+sed_script="$(mktemp)"
+trap 'rm -f "${sed_script}"' EXIT
+
+# Two sources, because neither is complete on its own. variants/<v>.yml carries
+# the semantic and AnsiColorN anchors; the terminal-standard table adds the
+# Bright*/Dim* names. The yml is emitted first so it wins on any overlap -- once
+# sed has replaced a placeholder there's nothing left for a later rule to match.
+{
+  _fetch "${PALETTE_REPO}" "variants/${VARIANT}.yml" |
+    sed -nE "s/^[[:space:]]*-[[:space:]]*&([A-Za-z0-9]+)[[:space:]]+'(#[0-9A-Fa-f]{6})'.*/s|{{\1}}|\2|g/p"
+
+  # pro.yml has no trailing newline and sed preserves that, so without this the
+  # last rule above would run into the first rule below on one line.
+  echo
+
+  _fetch "${PALETTE_REPO}" "terminal-standard/palette.md" |
+    awk -v want="${VARIANT}" '
+      /^## / { section = tolower($2); active = (section == want) }
+      active
+    ' |
+    sed -nE 's/^\| *([A-Za-z0-9]+) *\| *`(#[0-9A-Fa-f]{6})`.*/s|{{\1}}|\2|g/p'
+} >"${sed_script}"
+
+if [ ! -s "${sed_script}" ]; then
+  echo "No colours found for variant '${VARIANT}' -- is the name right?" >&2
+  exit 1
+fi
+
+echo "  ${THEME}: $(wc -l <"${sed_script}") colours"
+
+mkdir -p "${output_path}"
+
+for template in "${templates_path}"/*; do
+  [ -f "${template}" ] || continue
+  sed -f "${sed_script}" "${template}" >"${output_path}/$(basename "${template}")"
+done
+
+# A leftover placeholder means the palette moved or a template gained a name
+# the palette doesn't define. Fail loudly rather than shipping a broken theme.
+leftovers="$(grep -rhoE "\{\{[A-Za-z0-9]+\}\}" "${output_path}" | sort -u || true)"
+
+if [ -n "${leftovers}" ]; then
+  echo "Unresolved placeholders after rendering:" >&2
+  echo "${leftovers}" >&2
+  exit 1
+fi
+
+# Files the org publishes directly. Richer than anything we'd template: the
+# alacritty theme defines search, hints, footer and dim colours too.
+alacritty_theme="dracula-pro.toml"
+[ "${VARIANT}" != "pro" ] && alacritty_theme="dracula-pro-${VARIANT}.toml"
+
+echo "Fetching official app themes..."
+_fetch "dracula-pro/alacritty" "alacritty/themes/${alacritty_theme}" \
+  >"${output_path}/alacritty.toml"
+
+# Ghostty resolves `theme = dracula-pro` against its own themes directory, so
+# this one lands outside the repo.
+ghostty_themes="${XDG_CONFIG_HOME:-${HOME}/.config}/ghostty/themes"
+mkdir -p "${ghostty_themes}"
+_fetch "dracula-pro/ghostty" "${VARIANT}" >"${ghostty_themes}/${THEME}"
+
+cat <<EOF
+
+Rendered ${THEME} into:
+
+    ${output_path}
+
+It's git-ignored on purpose -- the colours are licensed. Apply it with:
+
+    dot-theme-set ${THEME}
+
+EOF

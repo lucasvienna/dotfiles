@@ -1,0 +1,23 @@
+(
+  selected_tab: Some("{{Purple}}"),
+  command_fg: Some("{{Comment}}"),
+  selection_bg: Some("{{Selection}}"),
+  selection_fg: Some("{{Cyan}}"),
+  cmdbar_bg: Some("{{Background}}"),
+  cmdbar_extra_lines_bg: Some("{{Background}}"),
+  disabled_fg: Some("{{Comment}}"),
+  diff_line_add: Some("{{Green}}"),
+  diff_line_delete: Some("{{Red}}"),
+  diff_file_added: Some("{{Cyan}}"),
+  diff_file_removed: Some("{{Red}}"),
+  diff_file_moved: Some("{{Pink}}"),
+  diff_file_modified: Some("{{Yellow}}"),
+  commit_hash: Some("{{Purple}}"),
+  commit_time: Some("{{Cyan}}"),
+  commit_author: Some("{{Green}}"),
+  danger_fg: Some("{{Red}}"),
+  push_gauge_bg: Some("{{Background}}"),
+  push_gauge_fg: Some("{{Foreground}}"),
+  tag_fg: Some("{{Pink}}"),
+  branch_fg: Some("{{Yellow}}")
+)

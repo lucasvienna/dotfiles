@@ -1,0 +1,81 @@
+# Theme: dracula-pro
+# By: Zeno Rocha
+
+# Main bg
+theme[main_bg]="{{Background}}"
+
+# Main text color
+theme[main_fg]="{{Foreground}}"
+
+# Title color for boxes
+theme[title]="{{Foreground}}"
+
+# Highlight color for keyboard shortcuts
+theme[hi_fg]="{{Cyan}}"
+
+# Background color of selected item in processes box
+theme[selected_bg]="{{Selection}}"
+
+# Foreground color of selected item in processes box
+theme[selected_fg]="{{Foreground}}"
+
+# Color of inactive/disabled text
+theme[inactive_fg]="{{Comment}}"
+
+# Misc colors for processes box including mini cpu graphs, details memory graph and details status text
+theme[proc_misc]="{{Cyan}}"
+
+# Cpu box outline color
+theme[cpu_box]="{{Comment}}"
+
+# Memory/disks box outline color
+theme[mem_box]="{{Comment}}"
+
+# Net up/down box outline color
+theme[net_box]="{{Comment}}"
+
+# Processes box outline color
+theme[proc_box]="{{Comment}}"
+
+# Box divider line and small boxes line color
+theme[div_line]="{{Comment}}"
+
+# Temperature graph colors
+theme[temp_start]="{{DimGreen}}"
+theme[temp_mid]="{{DimYellow}}"
+theme[temp_end]="{{DimRed}}"
+
+# CPU graph colors
+theme[cpu_start]="{{DimGreen}}"
+theme[cpu_mid]="{{DimYellow}}"
+theme[cpu_end]="{{DimRed}}"
+
+# Mem/Disk free meter
+theme[free_start]="{{DimGreen}}"
+theme[free_mid]="{{DimYellow}}"
+theme[free_end]="{{DimRed}}"
+
+# Mem/Disk cached meter
+theme[cached_start]="{{DimGreen}}"
+theme[cached_mid]="{{DimYellow}}"
+theme[cached_end]="{{DimRed}}"
+
+# Mem/Disk available meter
+theme[available_start]="{{DimGreen}}"
+theme[available_mid]="{{DimYellow}}"
+theme[available_end]="{{DimRed}}"
+
+# Mem/Disk used meter
+theme[used_start]="{{DimGreen}}"
+theme[used_mid]="{{DimYellow}}"
+theme[used_end]="{{DimRed}}"
+
+# Download graph colors
+theme[download_start]="{{DimGreen}}"
+theme[download_mid]="{{DimYellow}}"
+theme[download_end]="{{DimRed}}"
+
+# Upload graph colors
+theme[upload_start]="{{DimGreen}}"
+theme[upload_mid]="{{DimYellow}}"
+theme[upload_end]="{{DimRed}}"

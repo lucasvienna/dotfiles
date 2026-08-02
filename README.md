@@ -158,10 +158,27 @@ one is running.
 
 - **Tokyonight Moon**: High contrast, excellent for recordings
 - **Catppuccin Macchiato**: Soft pastels on a medium-dark base
-- **Dracula Pro**: Modern dark theme with vibrant accents
+- **Dracula Pro**: Modern dark theme with vibrant accents — *licensed, fetched
+  on demand*
 
 Add your own themes by creating a new directory in `themes/` with configs for
 each app.
+
+**Licensed themes.** Dracula PRO is a paid theme, so its colours aren't in this
+repo. `themes/dracula-pro/` is git-ignored and rendered on demand from the
+templates in `_themes/dracula-pro/`, which hold structure but no colours:
+
+```bash
+dot-theme-fetch              # render dracula-pro
+dot-theme-fetch --list       # what can be fetched
+dot-theme-set dracula-pro    # then apply it
+```
+
+This needs membership of the `dracula-pro` GitHub org and an authenticated
+`gh`. Colours come from that org's `palette` repo; the alacritty and ghostty
+themes are fetched verbatim from the org rather than templated, since the
+official files carry more detail. If you try to apply the theme before fetching
+it, `dot-theme-set` tells you so.
 
 ## Maintenance
 
@@ -273,11 +290,12 @@ Note: Systemd is intentionally disabled to avoid the 10-15 second startup delay.
 ├── bottom/        # System monitor (base.toml, merged with theme styles)
 └── btop/          # System monitor
 
-.local/bin/        # Custom scripts
-├── dot-theme-set  # Theme switcher
-├── clip-copy      # Cross-platform clipboard
-├── clip-paste     # Clipboard utilities
-└── mkscript       # Script generator
+.local/bin/         # Custom scripts
+├── dot-theme-set   # Theme switcher
+├── dot-theme-fetch # Render licensed themes from templates
+├── clip-copy       # Cross-platform clipboard
+├── clip-paste      # Clipboard utilities
+└── mkscript        # Script generator
 
 _install/          # Installer data, separate from install's logic
 ├── env            # Shared helpers, OS + AUR helper detection
@@ -286,6 +304,7 @@ _install/          # Installer data, separate from install's logic
 └── symlinks       # Stow rules
 
 themes/            # System-wide themes
+_themes/           # Templates for licensed themes (structure, no colours)
 install            # Main installation script
 install-config     # Your customizations (git-ignored)
 ```

@@ -1,0 +1,52 @@
+
+[styles]
+
+[styles.cpu]
+all_entry_colour = "{{Foreground}}"
+avg_entry_colour = "{{Red}}"
+cpu_core_colours = [
+  "{{Purple}}",
+  "{{Green}}",
+  "{{Yellow}}",
+  "{{Pink}}",
+  "{{Cyan}}",
+  "{{Orange}}",
+  "{{Red}}",
+  "{{Comment}}",
+]
+
+[styles.temp_graph]
+temp_graph_colour_styles = ["{{Cyan}}", "{{Green}}", "{{Yellow}}", "{{Orange}}", "{{Red}}"]
+
+[styles.memory]
+ram_colour = "{{Purple}}"
+cache_colour = "{{Cyan}}"
+swap_colour = "{{Yellow}}"
+arc_colour = "{{Green}}"
+gpu_colours = ["{{Pink}}", "{{Orange}}", "{{Cyan}}", "{{Green}}", "{{Red}}"]
+
+[styles.network]
+rx_colour = "{{Green}}"
+tx_colour = "{{Red}}"
+rx_total_colour = "{{Cyan}}"
+tx_total_colour = "{{Yellow}}"
+
+[styles.battery]
+high_battery_colour = "{{Green}}"
+medium_battery_colour = "{{Yellow}}"
+low_battery_colour = "{{Red}}"
+
+[styles.tables]
+headers = { colour = "{{Purple}}", bold = true }
+
+[styles.graphs]
+graph_colour = "{{Comment}}"
+legend_text = { colour = "{{Comment}}" }
+
+[styles.widgets]
+border_colour = "{{Purple}}"
+selected_border_colour = "{{Pink}}"
+widget_title = { colour = "{{Foreground}}", bold = true }
+text = { colour = "{{Foreground}}" }
+selected_text = { colour = "{{Background}}", bg_colour = "{{Purple}}" }
+disabled_text = { colour = "{{Comment}}" }
