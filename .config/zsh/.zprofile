@@ -48,8 +48,19 @@ export LANG=en_US.UTF-8
 
 # Default programs to run.
 export EDITOR="nvim"
-export VISUAL="zed"
 export DIFFPROG="nvim -d"
+
+# Zed's own installer (macOS, and its Linux tarball) provides a `zed` CLI, but
+# Arch packages the binary as `zeditor`. Resolve whichever exists rather than
+# hardcoding one, and fall back to EDITOR so VISUAL is never a command that
+# isn't installed.
+if command -v zed >/dev/null 2>&1; then
+  export VISUAL="zed"
+elif command -v zeditor >/dev/null 2>&1; then
+  export VISUAL="zeditor"
+else
+  export VISUAL="${EDITOR}"
+fi
 
 # Homebrew customisation
 export HOMEBREW_NO_ENV_HINTS=1

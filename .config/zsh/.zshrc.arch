@@ -69,3 +69,9 @@ fi
 alias make='make -j$(nproc)'
 alias ninja='ninja -j$(nproc)'
 alias n="ninja"
+
+# -----------------------------------------------------------------------------
+# Misc
+# -----------------------------------------------------------------------------
+# Arch ships the Zed editor's binary as `zeditor`; everywhere else it's `zed`.
+command -v zeditor >/dev/null 2>&1 && alias zed="zeditor"

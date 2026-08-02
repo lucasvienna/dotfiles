@@ -68,6 +68,7 @@ PACMAN_PACKAGES="${PACMAN_PACKAGES:-
   wl-clipboard
   xz
   yq
+  zed
   zip
   zoxide
   zsh
