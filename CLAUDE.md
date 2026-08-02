@@ -357,13 +357,24 @@ Neovim reloads.
 
 **Load Order**:
 
-1. `.zshenv` (in `$HOME`, symlinked) - Sets `ZDOTDIR=${HOME}/.config/zsh`
-2. `.config/zsh/.zprofile` - Login shell initialization (PATH, XDG vars,
+1. `.zshenv` (in `$HOME`, symlinked) - Sets `XDG_CONFIG_HOME` and
+   `ZDOTDIR=${HOME}/.config/zsh`
+2. `.config/zsh/.zprofile` - Environment (PATH, XDG vars, GHQ_ROOT, EDITOR,
    GPG_TTY)
 3. `.config/zsh/.zprofile.local` - User additions (git-ignored)
 4. `.config/zsh/.zshrc` - Interactive shell setup (Oh-My-Zsh, plugins, aliases)
 5. `.config/zsh/.zshrc.arch` - Arch-only additions, gated on `/etc/arch-release`
 6. `.config/zsh/.zshrc.local` - User additions (git-ignored)
+
+**`.zprofile` is not login-only in practice.** zsh runs it for login shells
+only, and macOS terminals and `wsl.exe` start login shells — but most Linux
+terminal emulators start non-login interactive ones, which would leave `PATH`,
+`EDITOR`, `GHQ_ROOT`, `DOTFILES_PATH` and the mise shims unset in every window.
+`.zshrc` therefore sources `.zprofile` itself when it hasn't already run,
+guarded by the `DOTFILES_ZPROFILE_SOURCED` sentinel that `.zprofile` exports so
+login shells don't load it twice and duplicate `PATH` entries. The source has to
+stay at the very top of `.zshrc`, since everything after it expects that
+environment.
 
 **Oh-My-Zsh Integration**:
 

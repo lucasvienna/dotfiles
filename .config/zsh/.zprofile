@@ -1,6 +1,9 @@
 # shellcheck shell=bash
 
-# This file runs once at login.
+# This file runs once at login -- and, on systems whose terminals start
+# non-login shells (most Linux desktops), once from .zshrc instead. The sentinel
+# below is what stops it running twice and duplicating PATH entries.
+export DOTFILES_ZPROFILE_SOURCED=1
 
 # Set up a few standard directories based on the XDG Base Directory specification:
 #   https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html

@@ -1,3 +1,14 @@
+# zsh only runs .zprofile for login shells. macOS terminals and wsl.exe start
+# login shells, but most Linux terminal emulators don't -- which would leave
+# PATH, EDITOR, GHQ_ROOT, DOTFILES_PATH and the mise shims unset in every window.
+# Source it here when that's happened; the sentinel keeps login shells from
+# loading it twice. Must come first, since everything below expects that
+# environment.
+# shellcheck disable=SC1091
+if [[ -z "${DOTFILES_ZPROFILE_SOURCED:-}" && -f "${ZDOTDIR:-${HOME}/.config/zsh}/.zprofile" ]]; then
+  . "${ZDOTDIR:-${HOME}/.config/zsh}/.zprofile"
+fi
+
 # Put programs on `/etc/paths.d/` in the PATH
 # eval `/usr/libexec/path_helper -s`
 
