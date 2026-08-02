@@ -11,7 +11,7 @@
 
 -- For ease of debugging, setting the default to WARN is a nice middleground
 -- It's not super noisy, but quick glances at the file are still useful.
-vim.lsp.set_log_level("WARN")
+vim.lsp.log.set_level(vim.log.levels.WARN)
 
 local opt = vim.opt
 
