@@ -1026,6 +1026,8 @@ install_tmux_plugins() {
   else
     rm -rf "${catppuccin_path}"
     git clone https://github.com/catppuccin/tmux.git "${catppuccin_path}"
+    git -C "${catppuccin_path}" config remote.origin.tagOpt --tags
+    git -C "${catppuccin_path}" config fetch.pruneTags true
   fi
 
   "${tpm_path}/bin/install_plugins"
