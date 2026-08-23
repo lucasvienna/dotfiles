@@ -8,11 +8,13 @@
 if [[ -z "${MISE_LANGUAGES[*]:-}" ]]; then
   declare -gA MISE_LANGUAGES
   MISE_LANGUAGES["node"]="node@lts"
-  MISE_LANGUAGES["bun"]="bun@latest"
-  MISE_LANGUAGES["python"]="python@3.14"
+  MISE_LANGUAGES["deno"]="deno@latest"
   MISE_LANGUAGES["go"]="go@latest"
+  MISE_LANGUAGES["python"]="python@3.14"
 fi
 
 if [[ -z "${MISE_LANGUAGES_EXTRAS[*]:-}" ]]; then
   declare -gA MISE_LANGUAGES_EXTRAS
+  MISE_LANGUAGES_EXTRAS["pnpm"]="pnpm@latest"
+  MISE_LANGUAGES_EXTRAS["aube"]="aube@latest"
 fi
