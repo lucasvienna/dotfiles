@@ -1,7 +1,7 @@
 return {
 	{
 		"git@github.com:dracula-pro/vim.git",
-		name = "dracula_pro",
+		name = "dracula-pro",
 		lazy = false,
 		priority = 1000,
 		init = function()
@@ -16,7 +16,7 @@ return {
 
 			-- Override highlights after colorscheme loads
 			vim.api.nvim_create_autocmd("ColorScheme", {
-				pattern = "dracula_pro*",
+				pattern = "dracula-pro*",
 				callback = function()
 					-- More visible active button in Lazy UI
 					vim.api.nvim_set_hl(0, "LazyButtonActive", { bg = "#7c6f9f", fg = "{{Foreground}}", bold = true })
@@ -27,7 +27,7 @@ return {
 	{
 		"LazyVim/LazyVim",
 		opts = {
-			colorscheme = "dracula_pro",
+			colorscheme = "dracula-pro",
 		},
 	},
 }

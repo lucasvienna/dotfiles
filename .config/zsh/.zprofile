@@ -55,11 +55,11 @@ export DIFFPROG="nvim -d"
 # hardcoding one, and fall back to EDITOR so VISUAL is never a command that
 # isn't installed.
 if command -v zed >/dev/null 2>&1; then
-  export VISUAL="zed"
+	export VISUAL="zed"
 elif command -v zeditor >/dev/null 2>&1; then
-  export VISUAL="zeditor"
+	export VISUAL="zeditor"
 else
-  export VISUAL="${EDITOR}"
+	export VISUAL="${EDITOR}"
 fi
 
 # Homebrew customisation
