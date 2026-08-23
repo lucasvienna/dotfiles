@@ -78,6 +78,8 @@ alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resource
 # [C] explained: http://www.commandlinefu.com/commands/view/402/exclude-grep-from-your-grepped-output-of-ps-alias-included-in-description
 alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v extension-process | tr -s ' ' | cut -d ' ' -f2 | xargs kill"
 
+# Environment
+alias lde='export $(grep -v "^#" .env | xargs)'
 # Networking
 alias ports="lsof -i -P -n | grep LISTEN"
 alias k8080="lsof -ti tcp:8080 | xargs -r kill"
@@ -94,5 +96,6 @@ alias gi="git init && git symbolic-ref HEAD refs/heads/main"
 alias gii="gi && gac 'Initial commit'"
 alias grao='git remote add origin'
 alias gpoa='git push -u origin --all'
+alias gcu='git cleanup'
 ##### sync all branches with remote
 alias gitsync="git branch -r | grep -v '\->' | while read remote; do git branch --track \"${remote#origin/}\" \"$remote\"; done && git pull --all"

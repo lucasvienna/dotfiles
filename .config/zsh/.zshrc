@@ -86,6 +86,9 @@ fi
 # Enable mise automatic activation
 eval "$(mise activate zsh)"
 
+# Enable aube activation
+eval "$(aube activate zsh)"
+
 # fzf: load shared opts (FZF_DEFAULT_OPTS / _COMMAND / CTRL_T_OPTS) and the
 # native shell integration (CTRL+T file picker, CTRL+R history, ALT+C cd).
 # shellcheck disable=SC1091
