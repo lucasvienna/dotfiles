@@ -299,6 +299,25 @@ _stowit() {
   return 0
 }
 
+_is_compdef_for() {
+  [[ "${2}" == "#compdef ${1}"* ]]
+}
+
+_has_system_completion() {
+  local tool="${1}"
+  local dir
+
+  for dir in \
+    /usr/share/zsh/site-functions \
+    /usr/share/zsh/functions/Completion/Unix \
+    /usr/local/share/zsh/site-functions \
+    "${HOMEBREW_PREFIX:-/opt/homebrew}/share/zsh/site-functions"; do
+    [ -f "${dir}/_${tool}" ] && return 0
+  done
+
+  return 1
+}
+
 # -----------------------------------------------------------------------------
 # Phase functions
 # -----------------------------------------------------------------------------
@@ -349,6 +368,7 @@ create_initial_dirs() {
     "${HOME}/.local/bin" \
     "${HOME}/.local/share/fonts" \
     "${XDG_DATA_HOME:-${HOME}/.local/share}/zsh/custom/plugins" \
+    "${XDG_DATA_HOME:-${HOME}/.local/share}/zsh/custom/completions" \
     "${GHQ_ROOT:-${HOME}/Workspace}"
 
   # alacritty.toml imports this unconditionally, so it has to exist even on a
@@ -1005,6 +1025,60 @@ install_programming_languages() {
   done
 }
 
+generate_completions() {
+  _info "GENERATE ZSH COMPLETIONS"
+
+  local comp_dir="${XDG_DATA_HOME:-${HOME}/.local/share}/zsh/custom/completions"
+  local -A generators
+  local -a argv
+  local tool mise_bin output count=0
+
+  for tool in "${!COMPLETION_GENERATORS[@]}"; do
+    generators["${tool}"]="${COMPLETION_GENERATORS[${tool}]}"
+  done
+
+  for tool in "${!COMPLETION_GENERATORS_EXTRAS[@]}"; do
+    generators["${tool}"]="${COMPLETION_GENERATORS_EXTRAS[${tool}]}"
+  done
+
+  mkdir -p "${comp_dir}"
+
+  for tool in "${!generators[@]}"; do
+    [ -z "${generators[${tool}]}" ] && continue
+    command -v "${tool}" 1>/dev/null 2>&1 || continue
+
+    mise_bin="$(mise which "${tool}" 2>/dev/null || true)"
+
+    # Anything pacman or Homebrew already completes is left alone so it keeps
+    # updating with the package rather than freezing until the next ./install.
+    if [ -z "${mise_bin}" ] && _has_system_completion "${tool}"; then
+      continue
+    fi
+
+    # Version-manager shims routinely answer a `completion` subcommand
+    # themselves. aube's pnpm shim returns aube's own completion, which would
+    # land under the wrong name and shadow the real one.
+    read -r -a argv <<<"${generators[${tool}]}" || true
+    [ -n "${mise_bin}" ] && argv[0]="${mise_bin}"
+
+    if ! output="$("${argv[@]}" 2>/dev/null)" || ! _is_compdef_for "${tool}" "${output}"; then
+      _skipping "${tool} produced no zsh completion"
+      continue
+    fi
+
+    printf "%s\n" "${output}" >"${comp_dir}/_${tool}"
+    echo "✓ Generated _${tool}"
+    count=$((count + 1))
+  done
+
+  # Adding a file to a directory already on fpath doesn't change $fpath, so
+  # Oh-My-Zsh won't invalidate its dump on its own and compinit would keep
+  # serving the cached function table.
+  rm -f "${XDG_CONFIG_HOME:-${HOME}/.config}/zsh/.zcompdump"*
+
+  echo "${count} completion(s) in '${comp_dir}'"
+}
+
 install_tmux_plugins() {
   _info "INSTALL TMUX PLUGINS"
 
@@ -1400,6 +1474,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   # shellcheck disable=SC1091
   source "${DOTFILES_PATH}/_install/mise_languages"
   # shellcheck disable=SC1091
+  source "${DOTFILES_PATH}/_install/completions"
+  # shellcheck disable=SC1091
   source "${DOTFILES_PATH}/_install/symlinks"
 
   parse_args "${@}"
@@ -1432,6 +1508,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   create_gpg_key
   configure_git
   install_programming_languages
+  generate_completions
   install_tmux_plugins
   install_nvim_plugins
   set_theme

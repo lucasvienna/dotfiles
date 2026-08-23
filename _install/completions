@@ -1,0 +1,36 @@
+# shellcheck shell=bash
+# Tools that can print their own zsh completion, for $ZSH_CUSTOM/completions.
+#
+# Keys are the binary name; values are the command that writes a compdef file
+# to stdout. A tool missing from PATH is skipped, so one table covers every OS.
+#
+# Override or extend in install-config. To skip everything, set a stub:
+#   declare -gA COMPLETION_GENERATORS=( ["_skip"]=" " )
+#
+# npm is absent on purpose. `npm completion zsh` prints a script meant to be
+# sourced, defining a function and calling compdef itself, rather than the
+# autoloadable file fpath wants. zsh ships its own _npm, so nothing is lost.
+
+if [[ -z "${COMPLETION_GENERATORS[*]:-}" ]]; then
+  declare -gA COMPLETION_GENERATORS
+
+  COMPLETION_GENERATORS["deno"]="deno completions zsh"
+  COMPLETION_GENERATORS["pnpm"]="pnpm completion zsh"
+  COMPLETION_GENERATORS["aube"]="aube completion zsh"
+
+  COMPLETION_GENERATORS["lazygit"]="lazygit completion zsh"
+  COMPLETION_GENERATORS["op"]="op completion zsh"
+
+  COMPLETION_GENERATORS["fd"]="fd --gen-completions zsh"
+  COMPLETION_GENERATORS["gh"]="gh completion --shell zsh"
+  COMPLETION_GENERATORS["helm"]="helm completion zsh"
+  COMPLETION_GENERATORS["k9s"]="k9s completion zsh"
+  COMPLETION_GENERATORS["kubectl"]="kubectl completion zsh"
+  COMPLETION_GENERATORS["rg"]="rg --generate complete-zsh"
+  COMPLETION_GENERATORS["starship"]="starship completions zsh"
+  COMPLETION_GENERATORS["yq"]="yq shell-completion zsh"
+fi
+
+if [[ -z "${COMPLETION_GENERATORS_EXTRAS[*]:-}" ]]; then
+  declare -gA COMPLETION_GENERATORS_EXTRAS
+fi

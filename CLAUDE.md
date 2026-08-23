@@ -108,7 +108,7 @@ The installer is split between two top-level entry points and a shared
 **Install phases** (`./install`):
 
 1. **Source**: `_install/env`, `install-config`, `_install/packages/${OS}`,
-   `_install/mise_languages`, `_install/symlinks`
+   `_install/mise_languages`, `_install/completions`, `_install/symlinks`
 2. **`detect_env`** + **`warn_root`** + **`update_dotfiles`** (only with --pull/--update)
 3. **`check_prereqs`** + **`create_initial_dirs`**
 4. **`install_packages`**: APT + Mise (Debian) or Homebrew + casks (macOS)
@@ -119,8 +119,9 @@ The installer is split between two top-level entry points and a shared
 9. **`configure_{system,home,shell,git}`**: shell aliases, git config.local
 10. **`ask_for_{name,email}`** + **`create_{ssh,gpg}_key`**: identity setup
 11. **`install_programming_languages`**: Mise languages
-12. **`install_{tmux,nvim}_plugins`**: TPM + Lazy
-13. **`set_theme`** + **`healthcheck`** + **`completed_message`**
+12. **`generate_completions`**: zsh completions into `$ZSH_CUSTOM/completions`
+13. **`install_{tmux,nvim}_plugins`**: TPM + Lazy
+14. **`set_theme`** + **`healthcheck`** + **`completed_message`**
 
 **Key Design Principles**:
 
@@ -129,7 +130,7 @@ The installer is split between two top-level entry points and a shared
 - **Cross-platform**: Handles macOS, Debian, Ubuntu, WSL 2
 - **Customizable**: `install-config` (git-ignored) allows overriding defaults
   without forking. Defaults live in `_install/packages/`, `_install/mise_languages`,
-  and `_install/symlinks`.
+  `_install/completions`, and `_install/symlinks`.
 - **Modular**: Data (package lists, languages, symlinks) is separate from
   logic. `_install/env` can be sourced by any script that needs the helpers.
 
@@ -404,6 +405,32 @@ working directory, which a subprocess cannot do for its parent. Note `^G` is
 
 **Updating plugins**: `update-omz-plugins` script clones/pulls latest versions.
 
+**Completions** live in `$ZSH_CUSTOM/completions`, which Oh-My-Zsh puts on
+`fpath` on its own, so no `.zshrc` line is needed. `generate_completions()`
+fills it from the `COMPLETION_GENERATORS` table in `_install/completions`.
+
+That directory sits *ahead* of `/usr/share/zsh/site-functions` on `fpath`, and
+that ordering drives the whole design. Generating a completion for a
+pacman- or Homebrew-managed tool would shadow a file that updates with the
+package with one that only updates on `./install`. So a tool is claimed only
+when Mise owns it (`mise which` resolves) or when `_has_system_completion`
+finds nothing anywhere else. The same table therefore does the right thing on
+all three OSes without an OS branch: `rg` is Mise-managed on Debian and
+generated, pacman-managed on Arch and skipped.
+
+Two traps the phase guards against:
+
+- Version-manager shims answer `completion` subcommands themselves. aube's
+  `pnpm` shim returns *aube's* completion, so `_pnpm` would end up holding
+  `#compdef aube`. Generators run the `mise which` path, not PATH's winner,
+  and the output must start with `#compdef <tool>`.
+- Adding a file to a directory already on `fpath` doesn't change `$fpath`, so
+  Oh-My-Zsh's own dump-invalidation check never fires. The phase removes
+  `${ZDOTDIR}/.zcompdump*` itself.
+
+`npm` is deliberately absent: `npm completion zsh` emits a script meant to be
+sourced, not an autoloadable file. zsh ships its own `_npm`.
+
 ### Git Configuration
 
 Located in `.config/git/`:
@@ -464,6 +491,7 @@ All use strict Bash mode: `set -o errexit -o pipefail -o nounset`
   `detect_aur_helper`, `_aur_install`, `warn_root`
 - `_install/packages/{debian,darwin,arch}` - Default package lists per OS
 - `_install/mise_languages` - Default Mise language definitions
+- `_install/completions` - Default zsh completion generators
 - `_install/symlinks` - Default `_stowit` symlink list
 - `mas.sh` - macOS App Store app installation
 

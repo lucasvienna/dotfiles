@@ -5,6 +5,7 @@
 # The defaults you'd be overriding live in:
 #   - _install/packages/{debian,darwin,arch}   # APT/Brew/Pacman/Mise lists
 #   - _install/mise_languages              # Mise programming languages
+#   - _install/completions                 # Zsh completion generators
 #   - _install/symlinks                    # GNU Stow / ln symlink rules
 #   - _install/env                         # Shared helpers + URLs
 #
@@ -66,6 +67,22 @@ declare -A MISE_LANGUAGES_EXTRAS=
 
 export MISE_LANGUAGES
 export MISE_LANGUAGES_EXTRAS
+
+# -----------------------------------------------------------------------------
+# Zsh completions
+# -----------------------------------------------------------------------------
+# Keys are the binary name; values are the command that prints a compdef file
+# to stdout. The defaults live in _install/completions. Anything already
+# completed by pacman or Homebrew is skipped automatically, so *_EXTRAS is for
+# tools the default table can't assume everyone has.
+declare -A COMPLETION_GENERATORS=
+declare -A COMPLETION_GENERATORS_EXTRAS=
+
+# Example:
+# COMPLETION_GENERATORS_EXTRAS["railway"]="railway completion zsh"
+
+export COMPLETION_GENERATORS
+export COMPLETION_GENERATORS_EXTRAS
 
 # -----------------------------------------------------------------------------
 # Symlinks
