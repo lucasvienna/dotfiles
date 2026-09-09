@@ -66,7 +66,10 @@ dot-theme-set
 
 Available themes:
 
-- `tokyonight-moon` - High contrast, excellent for video recording
+- `kanagawa-wave` - Ink-blue base, warm off-white text, muted but distinct hues
+- `tokyonight-night` - Darkest tokyonight variant, highest contrast
+- `tokyonight-moon` - Slightly lighter tokyonight, excellent for video recording
+- `catppuccin-mocha` - Darkest catppuccin flavour
 - `catppuccin-macchiato` - Soft pastels on a medium-dark base
 - `dracula-pro` - Modern dark theme with vibrant accents
 

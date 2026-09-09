@@ -1,0 +1,81 @@
+# Theme: kanagawa-wave
+# Palette: rebelot/kanagawa.nvim (wave)
+
+# Main bg
+theme[main_bg]="#1f1f28"
+
+# Main text color
+theme[main_fg]="#dcd7ba"
+
+# Title color for boxes
+theme[title]="#dcd7ba"
+
+# Highlight color for keyboard shortcuts
+theme[hi_fg]="#7fb4ca"
+
+# Background color of selected item in processes box
+theme[selected_bg]="#2d4f67"
+
+# Foreground color of selected item in processes box
+theme[selected_fg]="#dcd7ba"
+
+# Color of inactive/disabled text
+theme[inactive_fg]="#727169"
+
+# Misc colors for processes box including mini cpu graphs, details memory graph and details status text
+theme[proc_misc]="#7fb4ca"
+
+# Cpu box outline color
+theme[cpu_box]="#54546d"
+
+# Memory/disks box outline color
+theme[mem_box]="#54546d"
+
+# Net up/down box outline color
+theme[net_box]="#54546d"
+
+# Processes box outline color
+theme[proc_box]="#54546d"
+
+# Box divider line and small boxes line color
+theme[div_line]="#54546d"
+
+# Temperature graph colors
+theme[temp_start]="#98bb6c"
+theme[temp_mid]="#e6c384"
+theme[temp_end]="#e46876"
+
+# CPU graph colors
+theme[cpu_start]="#98bb6c"
+theme[cpu_mid]="#e6c384"
+theme[cpu_end]="#e46876"
+
+# Mem/Disk free meter
+theme[free_start]="#98bb6c"
+theme[free_mid]="#e6c384"
+theme[free_end]="#e46876"
+
+# Mem/Disk cached meter
+theme[cached_start]="#98bb6c"
+theme[cached_mid]="#e6c384"
+theme[cached_end]="#e46876"
+
+# Mem/Disk available meter
+theme[available_start]="#98bb6c"
+theme[available_mid]="#e6c384"
+theme[available_end]="#e46876"
+
+# Mem/Disk used meter
+theme[used_start]="#98bb6c"
+theme[used_mid]="#e6c384"
+theme[used_end]="#e46876"
+
+# Download graph colors
+theme[download_start]="#98bb6c"
+theme[download_mid]="#e6c384"
+theme[download_end]="#e46876"
+
+# Upload graph colors
+theme[upload_start]="#98bb6c"
+theme[upload_mid]="#e6c384"
+theme[upload_end]="#e46876"

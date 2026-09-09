@@ -17,3 +17,8 @@ local opt = vim.opt
 
 -- Show a vertical line at this character.
 opt.colorcolumn = "100"
+
+-- Border every floating window. Themes here keep the editor background
+-- transparent, so without a border and an opaque float bg the LSP hover
+-- popup is indistinguishable from the buffer behind it.
+opt.winborder = "rounded"

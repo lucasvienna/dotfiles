@@ -156,7 +156,10 @@ one is running.
 
 ### Included Themes
 
-- **Tokyonight Moon**: High contrast, excellent for recordings
+- **Kanagawa Wave**: Ink-blue base, warm off-white text, muted but distinct hues
+- **Tokyonight Night**: Darkest tokyonight variant, highest contrast
+- **Tokyonight Moon**: Slightly lighter tokyonight, excellent for recordings
+- **Catppuccin Mocha**: Darkest catppuccin flavour
 - **Catppuccin Macchiato**: Soft pastels on a medium-dark base
 - **Dracula Pro**: Modern dark theme with vibrant accents — *licensed, fetched
   on demand*
