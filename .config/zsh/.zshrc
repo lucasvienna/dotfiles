@@ -138,6 +138,12 @@ bindkey '^G' ghq-jump-widget
 [ -f /etc/arch-release ] && [ -f "${XDG_CONFIG_HOME}/zsh/.zshrc.arch" ] &&
 	. "${XDG_CONFIG_HOME}/zsh/.zshrc.arch"
 
+# Ghostty owns the tab title (repo, branch or Jira key, marker while claude
+# runs). Other terminals keep whatever they set themselves.
+# shellcheck disable=SC1091
+[[ $TERM_PROGRAM == ghostty ]] && [ -f "${XDG_CONFIG_HOME}/zsh/.zshrc.ghostty" ] &&
+	. "${XDG_CONFIG_HOME}/zsh/.zshrc.ghostty"
+
 # Load local settings if they exist.
 [ -f "${XDG_CONFIG_HOME}/zsh/.zshrc.local" ] && . "${XDG_CONFIG_HOME}/zsh/.zshrc.local"
 if [ -f "${XDG_CONFIG_HOME}/zsh/.aliases.local" ]; then . "${XDG_CONFIG_HOME}/zsh/.aliases.local"; fi

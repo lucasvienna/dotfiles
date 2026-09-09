@@ -18,6 +18,9 @@ keybind = shift+enter=text:\x1b\r
 # Options: false, true, left, right
 macos-option-as-alt = left
 
+# Disable automatic shell titles
+shell-integration-features = no-title
+
 # Load theme.
 config-file = ?theme
 

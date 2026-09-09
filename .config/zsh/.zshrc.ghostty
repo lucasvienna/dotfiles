@@ -1,0 +1,64 @@
+# shellcheck shell=bash
+# Ghostty tab title: repo or directory, branch or Jira key, and a marker while
+# selected commands run. Ghostty itself has shell titles off
+# (shell-integration-features = no-title), and oh-my-zsh's termsupport checks
+# DISABLE_AUTO_TITLE on every prompt, so this file owns the title alone.
+
+DISABLE_AUTO_TITLE="true"
+
+# Claude Code rewrites the title with a topic summary once it starts, which
+# would erase the marker below.
+export CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1
+
+# Command word -> prefix shown while that command runs.
+typeset -gA GHOSTTY_TITLE_MARKS=(
+	claude '👾 '
+)
+
+# Branches that add nothing to the title.
+typeset -ga GHOSTTY_TITLE_QUIET_BRANCHES=(main master develop HEAD)
+
+_ghostty_title_context() {
+	local -a info
+	info=(${(f)"$(git rev-parse --show-toplevel --abbrev-ref HEAD 2>/dev/null)"})
+	if (( ${#info} == 0 )); then
+		[[ $PWD == $HOME ]] && echo '~' || echo "${PWD:t}"
+		return
+	fi
+
+	local repo="${info[1]:t}" branch="${info[2]}"
+	local match mbegin mend
+	if [[ $branch =~ '[A-Z][A-Z0-9]+-[0-9]+' ]]; then
+		echo "${repo} ${MATCH}"
+	elif (( ${GHOSTTY_TITLE_QUIET_BRANCHES[(I)$branch]} )); then
+		echo "${repo}"
+	else
+		echo "${repo} @ ${branch}"
+	fi
+}
+
+_ghostty_title_set() {
+	printf '\e]2;%s\a' "$1"
+}
+
+_ghostty_title_precmd() {
+	_ghostty_title_set "$(_ghostty_title_context)"
+}
+
+# $3 is the full command line with aliases expanded. Match the command word
+# anywhere so `cd repo && claude` marks the tab too.
+_ghostty_title_preexec() {
+	local -a words
+	words=(${(z)3})
+	local word
+	for word in ${(k)GHOSTTY_TITLE_MARKS}; do
+		if (( ${words[(I)$word]} )); then
+			_ghostty_title_set "${GHOSTTY_TITLE_MARKS[$word]}$(_ghostty_title_context)"
+			return
+		fi
+	done
+}
+
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _ghostty_title_precmd
+add-zsh-hook preexec _ghostty_title_preexec
