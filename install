@@ -1233,7 +1233,7 @@ completed_message() {
   cat <<EOF
 Check out the README file on GitHub for any next steps:
 
-https://github.com/${DOTFILES_REPO_SLUG}#-make-it-your-own
+https://github.com/${DOTFILES_REPO_SLUG}#customization
 
 You can safely close this terminal.
 
