@@ -1,0 +1,324 @@
+#!/usr/bin/env python3
+"""Symlink locally developed WoW addons into the game editions their TOCs support.
+
+Detection order per addon folder:
+  1. Flavor-suffixed TOCs   (Foo_Mainline.toc, Foo-Vanilla.toc, ...)
+  2. ## Interface-<Flavor>: directives inside the plain TOC
+  3. ## Interface: numbers, mapped by major version
+
+Dry run by default. Pass --apply to actually touch the filesystem.
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import re
+import sys
+from pathlib import Path
+
+DEFAULT_SOURCE = "~/Workspace/github.com/AvyAddons"
+DEFAULT_GAME = "~/Games/blizzard-data/World of Warcraft"
+
+MAINLINE, VANILLA, TBC, WRATH, CATA, MISTS = (
+    "mainline", "vanilla", "tbc", "wrath", "cata", "mists",
+)
+
+FLAVOR_ALIASES = {
+    "mainline": MAINLINE, "standard": MAINLINE, "retail": MAINLINE,
+    "vanilla": VANILLA, "classic": VANILLA, "era": VANILLA,
+    "tbc": TBC, "bcc": TBC, "bc": TBC,
+    "wrath": WRATH, "wotlk": WRATH, "wotlkc": WRATH,
+    "cata": CATA, "cataclysm": CATA,
+    "mists": MISTS, "mop": MISTS,
+}
+
+# ## Interface major version -> flavor.
+MAJOR_TO_FLAVOR = {1: VANILLA, 2: TBC, 3: WRATH, 4: CATA, 5: MISTS}
+
+STATIC_DIR_FLAVOR = {
+    "_retail_": MAINLINE, "_ptr_": MAINLINE, "_xptr_": MAINLINE,
+    "_ptr2_": MAINLINE, "_beta_": MAINLINE, "_alpha_": MAINLINE,
+    "_classic_era_": VANILLA, "_classic_era_ptr_": VANILLA,
+    "_classic_era_beta_": VANILLA,
+}
+CLASSIC_DIRS = {"_classic_", "_classic_ptr_", "_classic_beta_"}
+
+IFACE_RE = re.compile(
+    r"^\s*##\s*Interface(?:-(?P<flavor>[A-Za-z]+))?\s*:\s*(?P<vals>.+?)\s*$",
+    re.IGNORECASE,
+)
+
+def find_tocs(addon_dir: Path) -> dict[str | None, Path]:
+    """Map flavor -> TOC path. Key None is the generic TOC.
+
+    Anchored on the folder name so an addon called BlizzardBars_Mouseover
+    doesn't get read as addon "BlizzardBars", flavor "Mouseover".
+    """
+    found: dict[str | None, Path] = {}
+    stem = addon_dir.name.lower()
+
+    for toc in addon_dir.glob("*.toc"):
+        base = toc.name[:-4]
+        low = base.lower()
+
+        if low == stem:
+            found[None] = toc
+            continue
+
+        for sep in ("_", "-"):
+            prefix = stem + sep
+            if low.startswith(prefix):
+                suffix = low[len(prefix):]
+                if suffix in FLAVOR_ALIASES:
+                    found[FLAVOR_ALIASES[suffix]] = toc
+                break
+
+    return found
+
+
+def flavor_from_interface(number: int) -> str | None:
+    major = number // 10000
+    if major in MAJOR_TO_FLAVOR:
+        return MAJOR_TO_FLAVOR[major]
+    return MAINLINE if major >= 6 else None
+
+
+def flavors_from_toc_body(toc: Path) -> set[str]:
+    flavors: set[str] = set()
+    try:
+        text = toc.read_text(encoding="utf-8-sig", errors="replace")
+    except OSError as exc:
+        print(f"  ! cannot read {toc.name}: {exc}", file=sys.stderr)
+        return flavors
+
+    for line in text.splitlines():
+        if not line.lstrip().startswith("##"):
+            continue
+        match = IFACE_RE.match(line)
+        if not match:
+            continue
+
+        tagged = match.group("flavor")
+        if tagged and tagged.lower() in FLAVOR_ALIASES:
+            flavors.add(FLAVOR_ALIASES[tagged.lower()])
+            continue
+
+        for token in re.split(r"[,\s]+", match.group("vals")):
+            if token.isdigit():
+                resolved = flavor_from_interface(int(token))
+                if resolved:
+                    flavors.add(resolved)
+
+    return flavors
+
+
+def detect_flavors(addon_dir: Path) -> tuple[set[str], str]:
+    tocs = find_tocs(addon_dir)
+    if not tocs:
+        return set(), "no toc"
+
+    suffixed = {f for f in tocs if f is not None}
+    if suffixed:
+        # A generic TOC alongside suffixed ones still counts: it's the
+        # fallback the client uses for any flavor without its own file.
+        generic = tocs.get(None)
+        if generic:
+            suffixed |= flavors_from_toc_body(generic)
+        return suffixed, "toc suffix"
+
+    return flavors_from_toc_body(tocs[None]), "interface number"
+
+def classic_flavor(game_root: Path) -> str | None:
+    info = game_root / ".build.info"
+    if not info.is_file():
+        return None
+    try:
+        lines = info.read_text(encoding="utf-8-sig", errors="replace").splitlines()
+    except OSError:
+        return None
+    if len(lines) < 2:
+        return None
+
+    header = [c.split("!")[0].strip() for c in lines[0].split("|")]
+    try:
+        p_idx, v_idx = header.index("Product"), header.index("Version")
+    except ValueError:
+        return None
+
+    for row in lines[1:]:
+        cols = row.split("|")
+        if len(cols) <= max(p_idx, v_idx):
+            continue
+        if cols[p_idx].strip() == "wow_classic":
+            try:
+                major = int(cols[v_idx].strip().split(".")[0])
+            except ValueError:
+                return None
+            return MAJOR_TO_FLAVOR.get(major)
+    return None
+
+
+def discover_editions(game_root: Path, override: str | None) -> dict[Path, str]:
+    editions: dict[Path, str] = {}
+    resolved_classic = None
+
+    if override:
+        resolved_classic = FLAVOR_ALIASES.get(override.lower())
+        if not resolved_classic:
+            sys.exit(f"unknown --classic-flavor: {override}")
+    else:
+        resolved_classic = classic_flavor(game_root)
+
+    for child in sorted(game_root.iterdir()):
+        if not child.is_dir():
+            continue
+        name = child.name.lower()
+        if name in STATIC_DIR_FLAVOR:
+            editions[child] = STATIC_DIR_FLAVOR[name]
+        elif name in CLASSIC_DIRS:
+            if resolved_classic:
+                editions[child] = resolved_classic
+            else:
+                print(
+                    f"  ! {child.name}: cannot determine expansion "
+                    f"(no readable .build.info) — pass --classic-flavor",
+                    file=sys.stderr,
+                )
+    return editions
+
+def find_addons(source: Path, depth: int) -> list[Path]:
+    addons: list[Path] = []
+    seen: set[Path] = set()
+
+    def walk(directory: Path, level: int) -> None:
+        for child in sorted(directory.iterdir()):
+            if not child.is_dir() or child.name.startswith("."):
+                continue
+            if find_tocs(child):
+                if child.resolve() not in seen:
+                    seen.add(child.resolve())
+                    addons.append(child)
+                continue
+            if level < depth:
+                walk(child, level + 1)
+
+    walk(source, 1)
+    return addons
+
+
+def link_one(addon: Path, addons_dir: Path, apply: bool) -> str:
+    dest = addons_dir / addon.name
+    want = str(addon.resolve())
+
+    if dest.is_symlink():
+        if os.path.realpath(dest) == want:
+            return "ok"
+        if apply:
+            dest.unlink()
+            dest.symlink_to(addon.resolve(), target_is_directory=True)
+        return "relink"
+
+    if dest.exists():
+        return "blocked"
+
+    if apply:
+        addons_dir.mkdir(parents=True, exist_ok=True)
+        dest.symlink_to(addon.resolve(), target_is_directory=True)
+    return "link"
+
+
+def prune(addons_dir: Path, source: Path, keep: set[str], apply: bool) -> list[str]:
+    removed = []
+    if not addons_dir.is_dir():
+        return removed
+    src = str(source.resolve())
+    for entry in sorted(addons_dir.iterdir()):
+        if not entry.is_symlink() or entry.name in keep:
+            continue
+        if os.path.realpath(entry).startswith(src + os.sep):
+            if apply:
+                entry.unlink()
+            removed.append(entry.name)
+    return removed
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--source", default=DEFAULT_SOURCE)
+    ap.add_argument("--game", default=DEFAULT_GAME)
+    ap.add_argument("--apply", action="store_true", help="actually create/remove links")
+    ap.add_argument("--prune", action="store_true",
+                    help="remove our stale links from AddOns folders")
+    ap.add_argument("--classic-flavor", metavar="FLAVOR",
+                    help="override what _classic_ is (e.g. mists, cata)")
+    ap.add_argument("--depth", type=int, default=3,
+                    help="how deep to search for addon folders (default 3)")
+    args = ap.parse_args()
+
+    source = Path(args.source).expanduser()
+    game = Path(args.game).expanduser()
+
+    for label, path in (("source", source), ("game", game)):
+        if not path.is_dir():
+            sys.exit(f"{label} directory not found: {path}")
+
+    editions = discover_editions(game, args.classic_flavor)
+    if not editions:
+        sys.exit(f"no game editions found under {game}")
+
+    print(f"source : {source}")
+    print(f"game   : {game}")
+    print("editions:")
+    for path, flavor in editions.items():
+        print(f"  {path.name:<20} {flavor}")
+    print()
+
+    addons = find_addons(source, args.depth)
+    if not addons:
+        sys.exit("no addons found (looked for a folder containing <FolderName>.toc)")
+
+    wanted: dict[Path, set[str]] = {p: set() for p in editions}
+    counts = {"link": 0, "relink": 0, "ok": 0, "blocked": 0}
+
+    for addon in addons:
+        flavors, how = detect_flavors(addon)
+        if not flavors:
+            print(f"{addon.name}: no usable flavor info — skipped")
+            continue
+
+        targets = [p for p, f in editions.items() if f in flavors]
+        print(f"{addon.name}  [{', '.join(sorted(flavors))}]  via {how}")
+
+        if not targets:
+            print("    (no matching edition installed)")
+            continue
+
+        for game_dir in targets:
+            addons_dir = game_dir / "Interface" / "AddOns"
+            action = link_one(addon, addons_dir, args.apply)
+            counts[action] += 1
+            wanted[game_dir].add(addon.name)
+            marker = {"ok": "=", "link": "+", "relink": "~", "blocked": "!"}[action]
+            note = " (real directory in the way)" if action == "blocked" else ""
+            print(f"    {marker} {game_dir.name}{note}")
+
+    if args.prune:
+        print()
+        for game_dir in editions:
+            gone = prune(game_dir / "Interface" / "AddOns", source,
+                         wanted[game_dir], args.apply)
+            for name in gone:
+                print(f"    - {game_dir.name}: {name}")
+
+    print()
+    print(f"{counts['link']} new, {counts['relink']} repointed, "
+          f"{counts['ok']} already correct, {counts['blocked']} blocked")
+    if not args.apply:
+        print("dry run — nothing changed. re-run with --apply")
+    return 1 if counts["blocked"] else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

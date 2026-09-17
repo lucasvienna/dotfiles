@@ -4,6 +4,9 @@
 
 local MAP = vim.keymap.set
 
+MAP("i", "jk", "<Esc>")
+MAP("t", "jk", "<C-\\><C-n>")
+
 MAP("n", "<leader>uW", ":set list!<CR>", { desc = "Toggle WhiteSpace" })
 
 MAP("n", "<leader>bc", ":let @+ = expand('%:.')<CR>", { desc = "Copy Path" })
