@@ -263,6 +263,11 @@ Dracula PRO is paid, and this repo is public, so its colours can't be committed.
 carrying structure with `{{PlaceholderName}}` tokens instead of hex values.
 `dot-theme-fetch` renders them:
 
+- Variants render into their own directory, `themes/dracula-pro-<variant>/`,
+  named the way the org names its alacritty and vim files. `{{ThemeName}}`
+  is the one non-colour placeholder; the ghostty and nvim templates use it for
+  the theme they load. `set_theme` maps `dracula-pro-alucard` back to the
+  `_themes/dracula-pro` templates when hinting at `dot-theme-fetch`.
 - Colours come from the private `dracula-pro/palette` repo, read with `gh`.
   Two sources are merged because neither is complete: `variants/<variant>.yml`
   supplies the semantic and `AnsiColorN` anchors, and the `## Pro` section of

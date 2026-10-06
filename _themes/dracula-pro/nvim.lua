@@ -27,7 +27,7 @@ return {
 	{
 		"LazyVim/LazyVim",
 		opts = {
-			colorscheme = "dracula-pro",
+			colorscheme = "{{ThemeName}}",
 		},
 	},
 }

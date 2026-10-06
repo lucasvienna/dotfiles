@@ -30,7 +30,7 @@ tags
 .config/bottom/bottom.toml
 # Dracula PRO is paid. Its colours are rendered on demand by dot-theme-fetch
 # from the templates in _themes/, and must never be committed here.
-themes/dracula-pro/
+themes/dracula-pro*/
 .config/zsh/*.local
 .local/bin/local/
 .zsh_history*

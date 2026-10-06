@@ -12,8 +12,11 @@
 # Usage:
 #   dot-theme-fetch                      # dracula-pro, "pro" variant
 #   dot-theme-fetch dracula-pro          # same
-#   dot-theme-fetch dracula-pro blade    # a different Dracula PRO variant
+#   dot-theme-fetch dracula-pro alucard  # a variant, into themes/dracula-pro-alucard/
 #   dot-theme-fetch --list               # what can be fetched
+#
+# Variants land in their own directory so several can coexist. The name matches
+# how the org names its own files (dracula-pro-alucard.toml, dracula-pro-alucard.vim).
 
 set -o errexit
 set -o pipefail
@@ -41,8 +44,12 @@ fi
 THEME="${1:-dracula-pro}"
 VARIANT="${2:-pro}"
 
+# "pro" is the default and keeps the bare theme name.
+THEME_NAME="${THEME}"
+[ "${VARIANT}" != "pro" ] && THEME_NAME="${THEME}-${VARIANT}"
+
 templates_path="${templates_root}/${THEME}"
-output_path="${DOTFILES_PATH}/themes/${THEME}"
+output_path="${DOTFILES_PATH}/themes/${THEME_NAME}"
 
 if [ ! -d "${templates_path}" ]; then
   echo "No templates for '${THEME}' in ${templates_root}" >&2
@@ -65,6 +72,11 @@ repo. You need to be a member of the dracula-pro org and authenticated:
 
     gh auth login
     gh api repos/${PALETTE_REPO}
+
+If GITHUB_TOKEN is set to a token without access to the org, unset it for
+this call so gh falls back to its keyring login:
+
+    GITHUB_TOKEN= ${0##*/} ${*}
 
 EOF
   exit 1
@@ -92,9 +104,20 @@ trap 'rm -f "${sed_script}"' EXIT
   # last rule above would run into the first rule below on one line.
   echo
 
+  # The file has CRLF line endings. Headings are "## Pro - Base", "## Alucard",
+  # "## Van Helsing": the name is every word before a lone "-", lowercased and
+  # hyphen-joined, so it lines up with the variants/<v>.yml file names.
   _fetch "${PALETTE_REPO}" "terminal-standard/palette.md" |
+    tr -d "\r" |
     awk -v want="${VARIANT}" '
-      /^## / { section = tolower($2); active = (section == want) }
+      /^## / {
+        section = ""
+        for (i = 2; i <= NF; i++) {
+          if ($i == "-") break
+          section = section (section ? "-" : "") tolower($i)
+        }
+        active = (section == want)
+      }
       active
     ' |
     sed -nE 's/^\| *([A-Za-z0-9]+) *\| *`(#[0-9A-Fa-f]{6})`.*/s|{{\1}}|\2|g/p'
@@ -105,7 +128,11 @@ if [ ! -s "${sed_script}" ]; then
   exit 1
 fi
 
-echo "  ${THEME}: $(wc -l <"${sed_script}") colours"
+# Not a colour, but resolved the same way: ghostty and nvim name the theme
+# they load, and that name differs per variant.
+echo "s|{{ThemeName}}|${THEME_NAME}|g" >>"${sed_script}"
+
+echo "  ${THEME_NAME}: $(wc -l <"${sed_script}") colours"
 
 mkdir -p "${output_path}"
 
@@ -133,20 +160,21 @@ echo "Fetching official app themes..."
 _fetch "dracula-pro/alacritty" "alacritty/themes/${alacritty_theme}" \
   >"${output_path}/alacritty.toml"
 
-# Ghostty resolves `theme = dracula-pro` against its own themes directory, so
-# this one lands outside the repo.
+# Ghostty resolves `theme = NAME` against its own themes directory, so this one
+# lands outside the repo. The org names the files by bare variant ("pro",
+# "alucard"); saving under the theme name keeps `theme = {{ThemeName}}` uniform.
 ghostty_themes="${XDG_CONFIG_HOME:-${HOME}/.config}/ghostty/themes"
 mkdir -p "${ghostty_themes}"
-_fetch "dracula-pro/ghostty" "${VARIANT}" >"${ghostty_themes}/${THEME}"
+_fetch "dracula-pro/ghostty" "${VARIANT}" >"${ghostty_themes}/${THEME_NAME}"
 
 cat <<EOF
 
-Rendered ${THEME} into:
+Rendered ${THEME_NAME} into:
 
     ${output_path}
 
 It's git-ignored on purpose -- the colours are licensed. Apply it with:
 
-    dot-theme-set ${THEME}
+    dot-theme-set ${THEME_NAME}
 
 EOF

@@ -127,7 +127,8 @@ running.
 - **Catppuccin Mocha**: Darkest catppuccin flavour
 - **Catppuccin Macchiato**: Soft pastels on a medium-dark base
 - **Dracula Pro**: Modern dark theme with vibrant accents — *licensed, fetched
-  on demand*
+  on demand*. Its variants (alucard, blade, buffy, lincoln, morbius,
+  van-helsing) render the same way; alucard is the light one.
 
 ### Licensed themes
 
@@ -136,9 +137,10 @@ is git-ignored and rendered on demand from the templates in
 `_themes/dracula-pro/`, which hold structure but no colours:
 
 ```bash
-dot-theme-fetch              # render dracula-pro
-dot-theme-fetch --list       # what can be fetched
-dot-theme-set dracula-pro    # then apply it
+dot-theme-fetch                      # render dracula-pro
+dot-theme-fetch dracula-pro alucard  # a variant, into themes/dracula-pro-alucard/
+dot-theme-fetch --list               # what can be fetched
+dot-theme-set dracula-pro            # then apply it
 ```
 
 This needs membership of the `dracula-pro` GitHub org and an authenticated

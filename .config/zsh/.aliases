@@ -100,5 +100,6 @@ alias gii="gi && gac 'Initial commit'"
 alias grao='git remote add origin'
 alias gpoa='git push -u origin --all'
 alias gcu='git cleanup'
+alias gsm='gswm && gfa && gl && gcu'
 ##### sync all branches with remote
 alias gitsync="git branch -r | grep -v '\->' | while read remote; do git branch --track \"${remote#origin/}\" \"$remote\"; done && git pull --all"

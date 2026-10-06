@@ -1138,13 +1138,24 @@ set_theme() {
   fi
 
   if [ ! -d "${DOTFILES_PATH}/themes/${theme}" ]; then
-    if [ -d "${DOTFILES_PATH}/_themes/${theme}" ]; then
+    # A licensed theme may be a variant, "dracula-pro-alucard", whose templates
+    # live under the base name. Match either the base name or base-<variant>.
+    local templates= variant=
+    for templates in "${DOTFILES_PATH}"/_themes/*/; do
+      templates="$(basename "${templates}")"
+      [[ "${theme}" == "${templates}" || "${theme}" == "${templates}"-* ]] && break
+      templates=
+    done
+
+    if [ -n "${templates}" ]; then
+      variant="${theme#"${templates}"}"
+      variant="${variant#-}"
       cat <<EOF >&2
 
 Theme '${theme}' hasn't been fetched yet. Its colours are licensed, so they
 aren't committed to this repo -- render them from the templates with:
 
-    dot-theme-fetch ${theme}
+    dot-theme-fetch ${templates} ${variant}
 
 EOF
     else
