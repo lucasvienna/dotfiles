@@ -19,7 +19,7 @@ keybind = shift+enter=text:\x1b\r
 macos-option-as-alt = left
 
 # Disable automatic shell titles
-shell-integration-features = no-title
+shell-integration-features = no-title,ssh-terminfo,ssh-env
 
 # Load theme.
 config-file = ?theme

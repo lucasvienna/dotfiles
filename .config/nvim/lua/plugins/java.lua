@@ -14,6 +14,12 @@ return {
         -- LazyVim's Java extra ships no default formatter.
         java = { "google-java-format", stop_after_first = true },
       },
+      formatters = {
+        -- Match Spotless, which leaves long string literals unsplit.
+        ["google-java-format"] = {
+          prepend_args = { "--skip-reflowing-long-strings" },
+        },
+      },
     },
   },
   {
