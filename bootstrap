@@ -25,7 +25,7 @@ export LOCAL="0"
 export DOTFILES_FIRST_RUN="1"
 export DOTFILES_PATH="${DOTFILES_PATH:-${HOME}/dotfiles}"
 
-for arg in "${@}"; do
+for arg in "$@"; do
   case "${arg}" in
   --local)
     LOCAL="1"

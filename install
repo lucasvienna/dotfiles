@@ -6,6 +6,20 @@
 
 set -o errexit
 
+# A fresh macOS shell lacks Homebrew on PATH, so env resolves to the system
+# Bash 3.2. Re-run under the Homebrew Bash that bootstrap installed.
+if ((BASH_VERSINFO[0] < 4)); then
+  for _prefix in /opt/homebrew /usr/local; do
+    if [ -x "${_prefix}/bin/bash" ]; then
+      eval "$("${_prefix}/bin/brew" shellenv)"
+      exec "${_prefix}/bin/bash" "${0}" "$@"
+    fi
+  done
+
+  printf "Bash 4+ is required, run ./bootstrap first to install it\n" >&2
+  exit 1
+fi
+
 # -----------------------------------------------------------------------------
 # Path resolution + shared library
 # -----------------------------------------------------------------------------
