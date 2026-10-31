@@ -34,10 +34,19 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
     -- Check for Go template syntax anywhere in the buffer
     local lines = vim.api.nvim_buf_get_lines(0, 0, math.min(vim.api.nvim_buf_line_count(0), 50), false)
     for _, line in ipairs(lines) do
+      -- GitHub Actions expressions (`${{ }}`) are not Go templates.
+      line = line:gsub("%${{.-}}", "")
       if line:match("{{.*}}") or line:match("{%%-?") then
         vim.opt_local.filetype = "helm"
         return
       end
     end
+  end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "noice",
+  callback = function(ev)
+    require("mini.hipatterns").enable(ev.buf)
   end,
 })
