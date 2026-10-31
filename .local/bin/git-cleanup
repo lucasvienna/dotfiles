@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Delete local branches whose changes are already on the default branch, whether
+# they landed by merge, rebase-merge or squash-merge. Compares patch-ids, not
+# hashes, so rewritten commits still count as merged.
+#
+# Examples:
+#   git cleanup
+
+set -o errexit -o pipefail -o nounset
+
+base="$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo main)"
+current="$(git branch --show-current)"
+
+git for-each-ref --format='%(refname:short)' refs/heads | while read -r branch; do
+  [[ "${branch}" == "${current}" || "${branch}" =~ ^(main|master|dev|develop)$ ]] && continue
+
+  # Merged or rebase-merged: every commit has a patch-equivalent on base
+  if ! git cherry "${base}" "${branch}" | grep -q '^+'; then
+    git branch -D "${branch}"
+    continue
+  fi
+
+  # Squash-merged: the branch's combined diff has an equivalent on base
+  squashed="$(git commit-tree "${branch}^{tree}" -p "$(git merge-base "${base}" "${branch}")" -m _)"
+  if [[ "$(git cherry "${base}" "${squashed}")" == -* ]]; then
+    git branch -D "${branch}"
+  fi
+done
