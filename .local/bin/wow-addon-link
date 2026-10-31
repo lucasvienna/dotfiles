@@ -20,13 +20,14 @@ from pathlib import Path
 DEFAULT_SOURCE = "~/Workspace/github.com/AvyAddons"
 DEFAULT_GAME = "~/Games/blizzard-data/World of Warcraft"
 
-MAINLINE, VANILLA, TBC, WRATH, CATA, MISTS = (
-    "mainline", "vanilla", "tbc", "wrath", "cata", "mists",
+MAINLINE, VANILLA, FOREVER, TBC, WRATH, CATA, MISTS = (
+    "mainline", "vanilla", "forever", "tbc", "wrath", "cata", "mists",
 )
 
 FLAVOR_ALIASES = {
     "mainline": MAINLINE, "standard": MAINLINE, "retail": MAINLINE,
     "vanilla": VANILLA, "classic": VANILLA, "era": VANILLA,
+    "forever": FOREVER,
     "tbc": TBC, "bcc": TBC, "bc": TBC,
     "wrath": WRATH, "wotlk": WRATH, "wotlkc": WRATH,
     "cata": CATA, "cataclysm": CATA,
@@ -36,13 +37,31 @@ FLAVOR_ALIASES = {
 # ## Interface major version -> flavor.
 MAJOR_TO_FLAVOR = {1: VANILLA, 2: TBC, 3: WRATH, 4: CATA, 5: MISTS}
 
+# Forever shares major version 1 with Vanilla and starts at 1.60.
+FOREVER_MIN_INTERFACE = 16000
+
 STATIC_DIR_FLAVOR = {
     "_retail_": MAINLINE, "_ptr_": MAINLINE, "_xptr_": MAINLINE,
     "_ptr2_": MAINLINE, "_beta_": MAINLINE, "_alpha_": MAINLINE,
     "_classic_era_": VANILLA, "_classic_era_ptr_": VANILLA,
-    "_classic_era_beta_": VANILLA,
+    "_classic_era_beta_": VANILLA, "_forever_": FOREVER,
 }
-CLASSIC_DIRS = {"_classic_", "_classic_ptr_", "_classic_beta_"}
+# Directories --classic-flavor applies to. Every other non-static directory
+# is resolved from its own .build.info row.
+CLASSIC_DIRS = {"_classic_", "_classic_ptr_"}
+
+# Marker -> ANSI colour. "=" stays uncoloured so changes stand out.
+MARKER_COLORS = {"+": "32", "-": "31", "~": "33", "!": "1;31"}
+USE_COLOR = sys.stdout.isatty() and "NO_COLOR" not in os.environ
+
+
+def entry(marker: str, text: str) -> str:
+    line = f"    {marker} {text}"
+    color = MARKER_COLORS.get(marker)
+    if USE_COLOR and color:
+        return f"\033[{color}m{line}\033[0m"
+    return line
+
 
 IFACE_RE = re.compile(
     r"^\s*##\s*Interface(?:-(?P<flavor>[A-Za-z]+))?\s*:\s*(?P<vals>.+?)\s*$",
@@ -79,6 +98,8 @@ def find_tocs(addon_dir: Path) -> dict[str | None, Path]:
 
 def flavor_from_interface(number: int) -> str | None:
     major = number // 10000
+    if major == 1 and number >= FOREVER_MIN_INTERFACE:
+        return FOREVER
     if major in MAJOR_TO_FLAVOR:
         return MAJOR_TO_FLAVOR[major]
     return MAINLINE if major >= 6 else None
@@ -129,46 +150,47 @@ def detect_flavors(addon_dir: Path) -> tuple[set[str], str]:
 
     return flavors_from_toc_body(tocs[None]), "interface number"
 
-def classic_flavor(game_root: Path) -> str | None:
+def build_versions(game_root: Path) -> dict[str, int]:
+    """Map .build.info product -> version as an interface-style number."""
+    versions: dict[str, int] = {}
     info = game_root / ".build.info"
     if not info.is_file():
-        return None
+        return versions
     try:
         lines = info.read_text(encoding="utf-8-sig", errors="replace").splitlines()
     except OSError:
-        return None
+        return versions
     if len(lines) < 2:
-        return None
+        return versions
 
     header = [c.split("!")[0].strip() for c in lines[0].split("|")]
     try:
         p_idx, v_idx = header.index("Product"), header.index("Version")
     except ValueError:
-        return None
+        return versions
 
     for row in lines[1:]:
         cols = row.split("|")
         if len(cols) <= max(p_idx, v_idx):
             continue
-        if cols[p_idx].strip() == "wow_classic":
-            try:
-                major = int(cols[v_idx].strip().split(".")[0])
-            except ValueError:
-                return None
-            return MAJOR_TO_FLAVOR.get(major)
-    return None
+        try:
+            major, minor = (int(n) for n in cols[v_idx].strip().split(".")[:2])
+        except ValueError:
+            continue
+        versions[cols[p_idx].strip()] = major * 10000 + minor * 100
+    return versions
 
 
 def discover_editions(game_root: Path, override: str | None) -> dict[Path, str]:
     editions: dict[Path, str] = {}
-    resolved_classic = None
+    forced_classic = None
 
     if override:
-        resolved_classic = FLAVOR_ALIASES.get(override.lower())
-        if not resolved_classic:
+        forced_classic = FLAVOR_ALIASES.get(override.lower())
+        if not forced_classic:
             sys.exit(f"unknown --classic-flavor: {override}")
-    else:
-        resolved_classic = classic_flavor(game_root)
+
+    versions = build_versions(game_root)
 
     for child in sorted(game_root.iterdir()):
         if not child.is_dir():
@@ -176,13 +198,19 @@ def discover_editions(game_root: Path, override: str | None) -> dict[Path, str]:
         name = child.name.lower()
         if name in STATIC_DIR_FLAVOR:
             editions[child] = STATIC_DIR_FLAVOR[name]
-        elif name in CLASSIC_DIRS:
-            if resolved_classic:
-                editions[child] = resolved_classic
+        elif forced_classic and name in CLASSIC_DIRS:
+            editions[child] = forced_classic
+        elif name.startswith("_") and name.endswith("_"):
+            # Product names follow the directory: _classic_beta_ is
+            # wow_classic_beta, _anniversary_ is wow_anniversary.
+            number = versions.get("wow" + name[:-1])
+            flavor = flavor_from_interface(number) if number else None
+            if flavor:
+                editions[child] = flavor
             else:
                 print(
                     f"  ! {child.name}: cannot determine expansion "
-                    f"(no readable .build.info) — pass --classic-flavor",
+                    f"(no matching .build.info row)",
                     file=sys.stderr,
                 )
     return editions
@@ -302,7 +330,7 @@ def main() -> int:
             wanted[game_dir].add(addon.name)
             marker = {"ok": "=", "link": "+", "relink": "~", "blocked": "!"}[action]
             note = " (real directory in the way)" if action == "blocked" else ""
-            print(f"    {marker} {game_dir.name}{note}")
+            print(entry(marker, f"{game_dir.name}{note}"))
 
     if args.prune:
         print()
@@ -310,7 +338,7 @@ def main() -> int:
             gone = prune(game_dir / "Interface" / "AddOns", source,
                          wanted[game_dir], args.apply)
             for name in gone:
-                print(f"    - {game_dir.name}: {name}")
+                print(entry("-", f"{game_dir.name}: {name}"))
 
     print()
     print(f"{counts['link']} new, {counts['relink']} repointed, "

@@ -1,7 +1,5 @@
 local function addon_root(bufnr)
-  return vim.fs.root(bufnr, function(name)
-    return name == ".wowluarc.json" or name:match("%.toc$") ~= nil
-  end)
+  return vim.fs.root(bufnr, ".wowluarc.json")
 end
 
 return {
@@ -11,6 +9,8 @@ return {
       enabled = function(root_dir)
         return vim.uv.fs_stat(root_dir .. "/.luarc.json") == nil
       end,
+      -- The integration replaces lua_ls's root_dir, which would drop the addon check below.
+      integrations = { lspconfig = false },
     },
   },
   {
@@ -33,10 +33,11 @@ return {
           end,
         },
         lua_ls = {
-          -- on_dir(nil) falls back to root_markers; skipping it keeps lua_ls out of addons.
+          -- Never calling on_dir keeps lua_ls out of addons. Elsewhere this is
+          -- what lazydev's lspconfig integration does.
           root_dir = function(bufnr, on_dir)
             if not addon_root(bufnr) then
-              on_dir(nil)
+              on_dir(require("lazydev").find_workspace(bufnr))
             end
           end,
         },
