@@ -299,8 +299,8 @@ MIT.
 
 ## Author
 
-Lucas Vienna, developer and DevOps engineer. These dotfiles run on every
-machine I work on. Issues and PRs are welcome.
+Lucas Vienna, software architect. These dotfiles run on every machine I work
+on. Issues and PRs are welcome.
 
 ## Acknowledgments
 
